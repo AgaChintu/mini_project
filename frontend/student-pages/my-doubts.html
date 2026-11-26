@@ -45,9 +45,9 @@
                 </a>
             </li>
             <li>
-                <a href="doubt-sessions.html">
-                    <i data-lucide="messages-square"></i>
-                    <span>Doubt Sessions</span>
+                <a href="ai-chatbot.html">
+                    <i data-lucide="bot"></i>
+                    <span>AI Chatbot</span>
                 </a>
             </li>
         
@@ -79,19 +79,11 @@
     </nav>
 
     <div class="top-right">
-
-        <button class="notification-btn">
-            <i data-lucide="bell"></i>
-        </button>
-
-        <button class="profile-btn">
-            <span class="avatar">A</span>
-            <span>Anushka</span>
+        <button class="profile-btn" onclick="window.location.href='dashboard.html'">
+            <span class="avatar" id="topAvatar">S</span>
+            <span id="topStudentName">Student</span>
             <i data-lucide="chevron-down"></i>
-
-
         </button>
-
     </div>
 
 
@@ -119,47 +111,30 @@
             <div class="select-wrapper">
                 <select class="select-subj" id="subjectSelect">
                     <option value="all">All Subjects</option>
-                    <option value="DSA">DSA</option>
-                    <option value="COA">COA</option>
-                    <option value="DSTL">DSTL</option>
-                    <option value="Python">Python</option>
-                    <option value="DE">DE</option>
-                    <option value="TC">TC</option>
                 </select>
-
                 <i data-lucide="chevron-down"></i>
             </div>
 
-            <button class="ask-doubt-btn">
+            <button class="ask-doubt-btn" onclick="window.location.href='ask-doubt.html'">
                 <i data-lucide="plus"></i>
                 Ask a Doubt
             </button>
         </div>
 
         <div class="doubt-controls">
-
             <div class="status-tabs">
                 <button class="status-tab-active" data-status="all">
                     All
                 </button>
-
                 <button class="status-tab" data-status="pending">
                     Pending
                 </button>
-
                 <button class="status-tab" data-status="in-progress">
                     In Progress
                 </button>
-
                 <button class="status-tab" data-status="resolved">
                     Resolved
                 </button>
-
-                <button class="status-tab" data-status="shared">
-                    Shared
-                </button>
-
-
             </div>
 
             <div class="sort-controls">
@@ -170,12 +145,65 @@
                 </select>
                 <i data-lucide="chevron-down" class="chevron-icon"></i>
             </div>
-
-
         </div>
 
-
         <div id="doubtContainer"></div>
+
+        <!-- ==========================================
+             DOUBT DETAIL MODAL
+        =========================================== -->
+        <div class="modal-overlay" id="doubtDetailModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(15,23,42,0.6); backdrop-filter:blur(4px); z-index:999; align-items:center; justify-content:center;">
+            <div class="modal-content" style="background:white; border-radius:20px; max-width:680px; width:90%; max-height:85vh; overflow-y:auto; padding:28px; box-shadow:0 20px 40px rgba(0,0,0,0.15);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span id="detailDoubtStatus" style="font-size:12px; font-weight:700; padding:4px 10px; border-radius:12px;">Status</span>
+                        <span id="detailDoubtCode" style="font-size:13px; color:#64748B; font-weight:600;">DOUBT-000</span>
+                    </div>
+                    <button onclick="closeDoubtDetailModal()" style="background:none; border:none; cursor:pointer; color:#64748B;">
+                        <i data-lucide="x"></i>
+                    </button>
+                </div>
+
+                <!-- Section 1: Doubt Info -->
+                <div style="margin-bottom:20px;">
+                    <h3 id="detailDoubtTitle" style="font-size:18px; font-weight:700; color:#1E293B; margin-bottom:8px;">Doubt Title</h3>
+                    <div style="font-size:13px; color:#64748B; margin-bottom:12px; display:flex; gap:16px;">
+                        <span>Subject: <strong id="detailDoubtSubject">-</strong></span>
+                        <span>Submitted: <span id="detailDoubtDate">-</span></span>
+                    </div>
+                    <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:14px; font-size:14px; color:#334155; line-height:1.6;" id="detailDoubtDesc">
+                        Description goes here...
+                    </div>
+                </div>
+
+                <!-- Section 2: Assigned Faculty Info -->
+                <div style="margin-bottom:20px; background:#F1F5F9; border-radius:12px; padding:14px;">
+                    <div style="font-size:12px; font-weight:700; color:#475569; text-transform:uppercase; margin-bottom:6px;">Assigned Faculty</div>
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <div style="width:38px; height:38px; border-radius:50%; background:#4F46E5; color:white; display:flex; align-items:center; justify-content:center; font-weight:700;">
+                            <i data-lucide="user" style="width:18px; height:18px;"></i>
+                        </div>
+                        <div>
+                            <h4 id="detailFacultyName" style="font-size:15px; font-weight:600; color:#1E293B; margin:0;">Faculty Name</h4>
+                            <p id="detailFacultyDept" style="font-size:12px; color:#64748B; margin:2px 0 0;">Department / Designation</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3: Verified Answer -->
+                <div>
+                    <div style="font-size:12px; font-weight:700; color:#059669; text-transform:uppercase; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+                        <i data-lucide="badge-check" style="width:16px; height:16px;"></i>
+                        <span>Faculty Verified Answer</span>
+                    </div>
+                    <div id="detailAnswerContainer"></div>
+                </div>
+
+                <div style="display:flex; justify-content:flex-end; margin-top:20px;">
+                    <button type="button" onclick="closeDoubtDetailModal()" style="padding:8px 16px; background:#F1F5F9; color:#475569; border:none; border-radius:8px; font-weight:600; cursor:pointer;">Close</button>
+                </div>
+            </div>
+        </div>
 
 
 

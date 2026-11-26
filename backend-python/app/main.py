@@ -1,64 +1,150 @@
 import os
-
-from fastapi import FastAPI
+import logging
+from contextlib import asynccontextmanager
+from fastapi import FastAPI, Request, status
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
-from app.database import engine, Base
+from app.core.config import settings
+from app.core.database import engine, Base, check_database_connection
+from app.core.exceptions import ClariQException, FileValidationError, EntityNotFoundError
 import app.models
 
+from app.routers.health import router as health_router
+from app.routers.academic import router as academic_router
 from app.routers.auth import router as auth_router
 from app.routers.student_sessions import router as student_sessions_router
 from app.routers.student_doubts import router as student_doubts_router
+from app.routers.student_dashboard import router as student_dashboard_router
+from app.routers.teacher_dashboard import router as teacher_dashboard_router
+from app.routers.subject_management import router as subject_management_router
+from app.routers.admin import router as admin_router
+from app.routers.admin_subjects import router as admin_subjects_router
+from app.routers.library import router as library_router
+from app.routers.copilot import router as copilot_router
+from app.routers.chatbot import router as chatbot_router
+
+logger = logging.getLogger("clariq.app")
+
+
+def bootstrap_super_admin():
+    """Initializes the initial Super Admin account idempotently if none exists."""
+    from app.core.database import SessionLocal
+    from app.models.admin import Admin
+    from app.security import hash_password
+
+    db = SessionLocal()
+    try:
+        admin_count = db.query(Admin).count()
+        if admin_count == 0:
+            super_admin = Admin(
+                username="admin",
+                full_name=settings.ADMIN_INITIAL_NAME,
+                email=settings.ADMIN_LOGIN_ID,
+                password_hash=hash_password(settings.ADMIN_INITIAL_PASSWORD),
+                is_active=True,
+            )
+            db.add(super_admin)
+            db.commit()
+            logger.info("Super Admin bootstrap account initialized successfully.")
+    except Exception as e:
+        logger.warning("Super Admin bootstrap skipped or failed: %s", e)
+        db.rollback()
+    finally:
+        db.close()
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Model imports register all mapped tables before create_all
+    Base.metadata.create_all(bind=engine)
+    bootstrap_super_admin()
+    yield
+
 
 app = FastAPI(
-    title="ClariQ API",
-    description="Identity-protected academic doubt resolution API.",
-    version="1.0.0",
+    title=settings.APP_NAME,
+    description="Identity-protected academic doubt resolution API for students and teachers.",
+    version=settings.APP_VERSION,
+    lifespan=lifespan,
 )
 
-origins = [
-    item.strip()
-    for item in os.getenv(
-        "CORS_ORIGINS",
-        "http://127.0.0.1:5500,http://localhost:5500,http://127.0.0.1:5501,http://localhost:5501",
-    ).split(",")
-    if item.strip()
-]
-
+# CORS configuration restricted to authorized origins and localhost regex
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=settings.cors_origins,
+    allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1)(:[0-9]+)?$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# Exception handlers for centralized error handling and security
+@app.exception_handler(ClariQException)
+async def handle_clariq_exception(request: Request, exc: ClariQException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"success": False, "message": exc.message, "data": None},
+    )
+
+
+@app.exception_handler(Exception)
+async def handle_generic_exception(request: Request, exc: Exception):
+    logger.error("Unhandled exception: %s", str(exc), exc_info=True)
+    message = "An internal server error occurred" if settings.APP_ENV == "production" else str(exc)
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content={"success": False, "message": message, "data": None},
+    )
+
+
+# Register API Routers
+app.include_router(health_router)
+app.include_router(academic_router)
 app.include_router(auth_router)
 app.include_router(student_sessions_router)
 app.include_router(student_doubts_router)
+app.include_router(student_dashboard_router)
+app.include_router(teacher_dashboard_router)
+app.include_router(subject_management_router)
+app.include_router(admin_router)
+app.include_router(admin_subjects_router)
+app.include_router(library_router)
+app.include_router(copilot_router)
+app.include_router(chatbot_router)
 
 
-@app.on_event("startup")
-def create_database_tables():
-    # Model imports above register all mapped tables before create_all.
-    Base.metadata.create_all(bind=engine)
-
-
+# Legacy & convenience endpoints preserved for backward compatibility
 @app.get("/", tags=["System"])
 def home():
-    return {"message": "ClariQ Backend is running!", "docs": "/docs"}
+    return {
+        "message": "ClariQ Backend is running!",
+        "version": settings.APP_VERSION,
+        "docs": "/docs",
+    }
 
 
 @app.get("/health", tags=["System"])
-def health():
-    return {"status": "ok", "service": "clariq-api"}
+def legacy_health():
+    """Legacy health check endpoint alias."""
+    db_status = check_database_connection()
+    return {
+        "status": "ok" if db_status["connected"] else "degraded",
+        "service": "clariq-api",
+        "database": db_status["status"],
+    }
 
 
 @app.get("/db-test", tags=["System"])
 def test_database():
-    with engine.connect() as connection:
-        connection.execute(text("SELECT 1"))
+    """Legacy db-test endpoint alias."""
+    db_status = check_database_connection()
+    if not db_status["connected"]:
+        return JSONResponse(
+            status_code=503,
+            content={"status": "error", "message": db_status.get("error", "Database connection failed")},
+        )
     return {"status": "success", "message": "Database connection successful."}
 
 
@@ -69,6 +155,7 @@ def list_tables():
 
 @app.get("/academic-structure", tags=["Academic"])
 def get_academic_structure():
+    """Legacy aggregate academic structure endpoint."""
     query = text("""
         SELECT
             ay.id AS year_id, ay.name AS year_name, ay.year_number,

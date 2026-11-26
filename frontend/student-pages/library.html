@@ -1,226 +1,680 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>ClariQ | Library</title>
+    <title>Academic Library | ClariQ</title>
 
     <link rel="stylesheet" href="../student-css/common.css">
     <link rel="stylesheet" href="../student-css/library.css">
-
-    <script src="../student-js/common.js" defer></script>
-    <script src="../student-js/library.js" defer></script>
-
     <script src="https://unpkg.com/lucide@latest"></script>
 
+    <style>
+        .lib-header {
+            margin-bottom: 24px;
+        }
+        .lib-header h1 {
+            font-size: 28px;
+            color: #0F2658;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .lib-header p {
+            color: #64748B;
+            font-size: 14px;
+        }
+
+        /* Filter Controls Bar */
+        .controls-card {
+            background: white;
+            border-radius: 16px;
+            padding: 16px 20px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+            border: 1px solid #E2E8F0;
+            margin-bottom: 24px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+        }
+        .search-field {
+            flex: 1;
+            min-width: 220px;
+            position: relative;
+        }
+        .search-field i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94A3B8;
+            width: 18px;
+            height: 18px;
+        }
+        .search-field input {
+            width: 100%;
+            padding: 10px 14px 10px 38px;
+            border-radius: 10px;
+            border: 1px solid #CBD5E1;
+            font-size: 14px;
+            font-family: 'Poppins', sans-serif;
+            outline: none;
+            transition: border 0.2s;
+        }
+        .search-field input:focus {
+            border-color: #4965E8;
+        }
+        .filter-select {
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1px solid #CBD5E1;
+            font-size: 13px;
+            font-family: 'Poppins', sans-serif;
+            background: white;
+            color: #334155;
+            cursor: pointer;
+            outline: none;
+        }
+        .filter-select:focus {
+            border-color: #4965E8;
+        }
+        .btn-toggle-important {
+            padding: 9px 14px;
+            border-radius: 10px;
+            border: 1px solid #F59E0B;
+            background: #FFFBEB;
+            color: #B45309;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+        .btn-toggle-important.active {
+            background: #F59E0B;
+            color: white;
+        }
+
+        /* Subject Banner */
+        .subject-banner {
+            background: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%);
+            color: white;
+            border-radius: 16px;
+            padding: 20px 24px;
+            margin-bottom: 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .subject-banner h2 {
+            font-size: 20px;
+            font-weight: 700;
+            margin: 0 0 4px;
+        }
+        .subject-banner p {
+            margin: 0;
+            font-size: 13px;
+            color: #DBEAFE;
+        }
+
+        /* Section Styling */
+        .faculty-section {
+            margin-bottom: 36px;
+        }
+        .section-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #F1F5F9;
+        }
+        .section-heading-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .section-badge-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .icon-primary {
+            background: #EFF6FF;
+            color: #2563EB;
+        }
+        .icon-additional {
+            background: #FEF3C7;
+            color: #D97706;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0F172A;
+            margin: 0;
+        }
+        .section-desc {
+            font-size: 12px;
+            color: #64748B;
+            margin: 2px 0 0;
+        }
+        .section-counter {
+            font-size: 12px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: #F1F5F9;
+            color: #475569;
+        }
+
+        /* Resources Grid */
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 18px;
+        }
+        .resource-card {
+            background: white;
+            border: 1px solid #E2E8F0;
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .resource-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(73, 101, 232, 0.08);
+            border-color: #CBD5E1;
+        }
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+        .card-type-tag {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 4px 8px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .tag-pdf { background: #FEE2E2; color: #DC2626; }
+        .tag-doc { background: #E0E7FF; color: #4338CA; }
+        .tag-youtube { background: #FFEDD5; color: #EA580C; }
+
+        .important-badge {
+            background: linear-gradient(135deg, #F59E0B, #D97706);
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            box-shadow: 0 2px 6px rgba(245, 158, 11, 0.3);
+        }
+
+        .resource-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1E293B;
+            margin: 0 0 6px;
+            line-height: 1.4;
+        }
+        .resource-desc {
+            font-size: 13px;
+            color: #64748B;
+            line-height: 1.5;
+            margin: 0 0 14px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .resource-meta {
+            font-size: 12px;
+            color: #94A3B8;
+            margin-bottom: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .resource-meta span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .resource-meta strong {
+            color: #475569;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: auto;
+            padding-top: 12px;
+            border-top: 1px solid #F1F5F9;
+        }
+        .btn-preview {
+            flex: 1;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid #CBD5E1;
+            background: #F8FAFC;
+            color: #334155;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+        .btn-preview:hover {
+            background: #EFF6FF;
+            color: #2563EB;
+            border-color: #93C5FD;
+        }
+        .btn-download {
+            flex: 1;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: none;
+            background: #4965E8;
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: background 0.2s;
+        }
+        .btn-download:hover {
+            background: #3751D0;
+        }
+        .btn-watch {
+            width: 100%;
+            padding: 9px 12px;
+            border-radius: 8px;
+            border: none;
+            background: #EA580C;
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: background 0.2s;
+        }
+        .btn-watch:hover {
+            background: #C2410C;
+        }
+
+        /* YouTube card preview */
+        .yt-thumb-wrapper {
+            position: relative;
+            width: 100%;
+            height: 160px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 12px;
+            background: #000;
+        }
+        .yt-thumb {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .yt-play-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.3);
+            transition: background 0.2s;
+        }
+        .yt-thumb-wrapper:hover .yt-play-overlay {
+            background: rgba(0, 0, 0, 0.5);
+        }
+        .yt-play-btn {
+            width: 48px;
+            height: 48px;
+            background: #FF0000;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(255, 0, 0, 0.4);
+        }
+
+        /* Empty State */
+        .empty-box {
+            background: #F8FAFC;
+            border: 2px dashed #E2E8F0;
+            border-radius: 14px;
+            padding: 40px 20px;
+            text-align: center;
+            color: #64748B;
+        }
+        .empty-box i {
+            width: 40px;
+            height: 40px;
+            color: #94A3B8;
+            margin-bottom: 10px;
+        }
+        .empty-box h4 {
+            font-size: 16px;
+            color: #334155;
+            margin: 0 0 4px;
+        }
+
+        /* Modals */
+        .lib-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .lib-modal.active {
+            display: flex;
+        }
+        .lib-modal-content {
+            background: white;
+            border-radius: 16px;
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+        .lib-modal-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid #E2E8F0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .lib-modal-header h3 {
+            font-size: 17px;
+            font-weight: 700;
+            color: #0F172A;
+            margin: 0;
+        }
+        .btn-close-modal {
+            background: transparent;
+            border: none;
+            color: #64748B;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 6px;
+        }
+        .btn-close-modal:hover {
+            background: #F1F5F9;
+            color: #0F172A;
+        }
+        .lib-modal-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+        }
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 10px;
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
 </head>
 
 <body>
-
-    <!-- ==========================================
-         SIDEBAR
-    ========================================== -->
-
+    <!-- SIDEBAR -->
     <nav class="sidebar">
-
         <img src="../assets/images/clariq-logo.svg" alt="ClariQ Logo" class="logo">
-
         <ul>
-
             <li>
                 <a href="dashboard.html">
                     <i data-lucide="house"></i>
                     <span>Home</span>
                 </a>
             </li>
-
             <li>
                 <a href="ask-doubt.html">
                     <i data-lucide="circle-help"></i>
                     <span>Ask Doubt</span>
                 </a>
             </li>
-
             <li>
                 <a href="my-doubts.html">
                     <i data-lucide="message-circle"></i>
                     <span>My Doubts</span>
                 </a>
             </li>
-
             <li>
                 <a href="library.html" class="nav-item-active">
                     <i data-lucide="book-open"></i>
                     <span>Library</span>
                 </a>
             </li>
-
             <li>
-                <a href="doubt-sessions.html">
-                    <i data-lucide="messages-square"></i>
-                    <span>Doubt Sessions</span>
+                <a href="ai-chatbot.html">
+                    <i data-lucide="bot"></i>
+                    <span>AI Chatbot</span>
                 </a>
             </li>
-
-
             <li>
                 <a href="saves.html">
                     <i data-lucide="bookmark"></i>
                     <span>Saves</span>
                 </a>
             </li>
-
         </ul>
 
-
-        <!-- ANONYMOUS BOX -->
-
         <div class="anonymous-box">
-
             <img src="../assets/icons/anonymous-icon.svg" alt="Anonymous Icon" class="anonymous-icon">
-
             <div class="anonymous-text">
-
                 <h3>Ask Freely, Stay Anonymous</h3>
-
-                <p>
-                    Your identity stays protected when you ask a doubt.
-                </p>
-
+                <p>Your identity stays protected when you ask a doubt.</p>
             </div>
-
         </div>
-
     </nav>
 
-
-    <!-- ==========================================
-         TOP RIGHT
-    ========================================== -->
-
+    <!-- TOPBAR -->
     <div class="top-right">
-
-        <button class="notification-btn">
-
-            <i data-lucide="bell"></i>
-
-        </button>
-
-
         <button class="profile-btn">
-
-            <span class="avatar">A</span>
-
-            <span>Anushka</span>
-
+            <span class="avatar" id="studentAvatar">S</span>
+            <span id="studentName">Student</span>
             <i data-lucide="chevron-down"></i>
-
         </button>
-
     </div>
 
-
-    <!-- ==========================================
-         MAIN CONTENT
-    ========================================== -->
-
+    <!-- MAIN CONTENT -->
     <main>
-
-
-        <!-- PAGE HEADING -->
-
-        <div class="page-title">
-
-            <h1>Library</h1>
-
-            <h2>
-                Explore resolved doubts and resources shared by teachers.
-            </h2>
-
+        <div style="max-width: 1200px; margin: 0 auto;">
+        <!-- HEADER -->
+        <div class="lib-header">
+            <h1>Academic Library</h1>
+            <p>Access syllabus notes, lecture references, and video tutorials uploaded by your subject faculties.</p>
         </div>
 
+        <!-- CONTROLS CARD -->
+        <div class="controls-card">
+            <!-- SUBJECT SELECT -->
+            <select id="subjectSelect" class="filter-select" style="font-weight: 600; min-width: 200px;">
+                <option value="">Loading subjects...</option>
+            </select>
 
-        <!-- ======================================
-             SEARCH AND FILTER
-        ====================================== -->
-
-        <div class="search-card">
-
-
-            <!-- SEARCH -->
-
-            <div class="search-box">
-
+            <!-- SEARCH INPUT -->
+            <div class="search-field">
                 <i data-lucide="search"></i>
-
-                <input type="text" placeholder="Search library..." id="searchInput">
-
+                <input type="text" id="libSearchInput" placeholder="Search by document title or description...">
             </div>
 
+            <!-- TYPE FILTER -->
+            <select id="typeFilter" class="filter-select">
+                <option value="">All Types</option>
+                <option value="pdf">PDF Documents</option>
+                <option value="doc">Word Docs (DOC/DOCX)</option>
+                <option value="youtube">YouTube Videos</option>
+            </select>
 
-            <!-- SUBJECT FILTER -->
+            <!-- FACULTY CATEGORY FILTER -->
+            <select id="facultyFilter" class="filter-select">
+                <option value="">All Faculty</option>
+                <option value="PRIMARY">Primary Faculty Only</option>
+                <option value="ADDITIONAL">Additional Faculty Only</option>
+            </select>
 
-            <div class="select-wrapper">
-
-                <select class="select-subj" id="subjectSelect">
-
-                    <option value="all">All Subjects</option>
-
-                    <option value="DSA">DSA</option>
-
-                    <option value="COA">COA</option>
-
-                    <option value="DSTL">DSTL</option>
-
-                    <option value="DE">DE</option>
-
-                    <option value="Python">Python</option>
-
-                    <option value="TC">TC</option>
-
-                </select>
-
-                <i data-lucide="chevron-down"></i>
-
-            </div>
-
-
-            <!-- ASK DOUBT BUTTON -->
-
-            <button class="ask-doubt-btn" onclick="window.location.href='ask-doubt.html'">
-
-                <i data-lucide="plus"></i>
-
-                Ask a Doubt
-
+            <!-- IMPORTANT ONLY TOGGLE -->
+            <button type="button" id="btnToggleImportant" class="btn-toggle-important">
+                <i data-lucide="star"></i>
+                <span>Important Only</span>
             </button>
 
-
+            <!-- SORT -->
+            <select id="sortSelect" class="filter-select">
+                <option value="newest">Newest First</option>
+                <option value="alpha">Alphabetical (A-Z)</option>
+            </select>
         </div>
 
-        <!-- ======================================
-            LIBRARY DOUBT CARDS
-        ====================================== -->
+        <!-- SUBJECT BANNER -->
+        <div id="subjectBanner" class="subject-banner" style="display: none;">
+            <div>
+                <h2 id="bannerSubjectName">Subject Name</h2>
+                <p id="bannerSubjectCode">Subject Code</p>
+            </div>
+            <div style="font-size: 13px; background: rgba(255,255,255,0.15); padding: 6px 14px; border-radius: 20px;">
+                <span id="totalResourcesCount">0</span> resources available
+            </div>
+        </div>
 
-        <div id="libraryList" class="library-list"></div>
+        <!-- LOADING STATE -->
+        <div id="loadingIndicator" style="text-align: center; padding: 40px; display: none;">
+            <p style="color: #64748B;">Fetching academic resources...</p>
+        </div>
 
+        <!-- SECTION 1: PRIMARY FACULTY RESOURCES -->
+        <section class="faculty-section" id="primarySection">
+            <div class="section-heading">
+                <div class="section-heading-left">
+                    <div class="section-badge-icon icon-primary">
+                        <i data-lucide="award"></i>
+                    </div>
+                    <div>
+                        <h3 class="section-title">Primary Faculty Documents</h3>
+                        <p class="section-desc">Core curriculum notes, syllabi, and official study material from the primary subject faculty.</p>
+                    </div>
+                </div>
+                <span class="section-counter" id="primaryCountBadge">0 resources</span>
+            </div>
+            <div id="primaryGrid" class="resources-grid"></div>
+            <div id="primaryEmpty" class="empty-box" style="display: none;">
+                <i data-lucide="folder-open"></i>
+                <h4>No primary faculty documents yet</h4>
+                <p>Your primary teacher hasn't published materials for this filter criteria.</p>
+            </div>
+        </section>
 
-        <!-- NO RESULTS -->
-
-        <p id="noResults" class="no-results" hidden>
-            No doubts found. Try another search.
-        </p>
-
-
+        <!-- SECTION 2: ADDITIONAL FACULTY RESOURCES -->
+        <section class="faculty-section" id="additionalSection">
+            <div class="section-heading">
+                <div class="section-heading-left">
+                    <div class="section-badge-icon icon-additional">
+                        <i data-lucide="book-marked"></i>
+                    </div>
+                    <div>
+                        <h3 class="section-title">Additional Faculty Documents</h3>
+                        <p class="section-desc">Supplementary references, question banks, and enrichment videos contributed by other faculty members.</p>
+                    </div>
+                </div>
+                <span class="section-counter" id="additionalCountBadge">0 resources</span>
+            </div>
+            <div id="additionalGrid" class="resources-grid"></div>
+            <div id="additionalEmpty" class="empty-box" style="display: none;">
+                <i data-lucide="folder-open"></i>
+                <h4>No additional faculty documents yet</h4>
+                <p>No supplementary resources are available under current filters.</p>
+            </div>
+        </section>
+        </div>
     </main>
 
+    <!-- YOUTUBE VIDEO PLAYER MODAL -->
+    <div id="ytModal" class="lib-modal">
+        <div class="lib-modal-content">
+            <div class="lib-modal-header">
+                <h3 id="ytModalTitle">YouTube Video</h3>
+                <button class="btn-close-modal" onclick="closeYtModal()">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="lib-modal-body">
+                <div class="video-container">
+                    <iframe id="ytIframe" src="" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <script>
-        lucide.createIcons();
-    </script>
+    <!-- PDF PREVIEW MODAL -->
+    <div id="pdfModal" class="lib-modal">
+        <div class="lib-modal-content" style="height: 85vh;">
+            <div class="lib-modal-header">
+                <h3 id="pdfModalTitle">Document Preview</h3>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <a id="pdfModalDownloadBtn" href="#" class="btn-download" style="padding: 6px 14px; text-decoration: none;">
+                        <i data-lucide="download"></i>
+                        <span>Download</span>
+                    </a>
+                    <button class="btn-close-modal" onclick="closePdfModal()">
+                        <i data-lucide="x"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="lib-modal-body" style="padding: 0;">
+                <iframe id="pdfIframe" src="" style="width: 100%; height: 100%; border: none;"></iframe>
+            </div>
+        </div>
+    </div>
 
+    <script src="../student-js/library.js"></script>
 </body>
-
 </html>

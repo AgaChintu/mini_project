@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login | ClariQ</title>
+    <link rel="stylesheet" href="../student-css/common.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .admin-login-card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+            max-width: 440px;
+            width: 100%;
+            padding: 40px;
+            text-align: left;
+        }
+        .admin-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #FEF3C7;
+            color: #92400E;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .login-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0F172A;
+            margin: 0 0 8px;
+        }
+        .login-subtitle {
+            font-size: 14px;
+            color: #64748B;
+            margin: 0 0 28px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 6px;
+        }
+        .form-input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #CBD5E1;
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.15s, box-shadow 0.15s;
+            box-sizing: border-box;
+        }
+        .form-input:focus {
+            border-color: #4F46E5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+        }
+        .btn-admin-login {
+            width: 100%;
+            padding: 13px;
+            background: #4F46E5;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-admin-login:hover {
+            background: #4338CA;
+        }
+        .error-banner {
+            display: none;
+            background: #FEE2E2;
+            border: 1px solid #FCA5A5;
+            color: #DC2626;
+            padding: 12px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+        .security-notice {
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid #F1F5F9;
+            font-size: 12px;
+            color: #94A3B8;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="admin-login-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <img src="../assets/images/clariq-logo.svg" alt="ClariQ" style="height: 32px;">
+            <span class="admin-badge">
+                <i data-lucide="shield-alert" style="width: 14px; height: 14px;"></i>
+                Admin Portal
+            </span>
+        </div>
+
+        <h1 class="login-title">Institutional Control</h1>
+        <p class="login-subtitle">Sign in to manage curriculum, faculty assignments, and institutional controls.</p>
+
+        <div id="errorBanner" class="error-banner"></div>
+
+        <form id="adminLoginForm" onsubmit="handleAdminLogin(event)">
+            <div class="form-group">
+                <label class="form-label" for="adminIdentifier">Admin Username or Email</label>
+                <input type="text" id="adminIdentifier" class="form-input" placeholder="admin@clariq.edu or admin" required autocomplete="username" />
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="adminPassword">Password</label>
+                <input type="password" id="adminPassword" class="form-input" placeholder="Enter administrative password" required autocomplete="current-password" />
+            </div>
+
+            <button type="submit" id="btnLoginSubmit" class="btn-admin-login">
+                <span>Sign In to Admin Panel</span>
+                <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
+            </button>
+        </form>
+
+        <div class="security-notice">
+            <i data-lucide="lock" style="width: 13px; height: 13px;"></i>
+            <span>Authorized institutional administrators only.</span>
+        </div>
+    </div>
+
+    <script src="../admin-js/login.js"></script>
+    <script>
+        if (window.lucide) lucide.createIcons();
+    </script>
+</body>
+</html>

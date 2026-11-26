@@ -4,305 +4,376 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Dashboard | ClariQ</title>
+    <title>Faculty Dashboard | ClariQ</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap"
-        rel="stylesheet">
-
-    <!-- Shared CSS -->
+    <!-- CSS -->
     <link rel="stylesheet" href="../teacher-css/common.css">
-
-    <!-- Dashboard CSS -->
     <link rel="stylesheet" href="../teacher-css/dashboard.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
 
-    <!-- Lucide -->
-    <script src="https://unpkg.com/lucide@latest" defer></script>
-
-    <!-- Shared Components -->
-    <script src="../teacher-js/components.js" defer></script>
-
-    <!-- Dashboard JS -->
-    <script src="../teacher-js/dashboard.js" defer></script>
-
+    <style>
+        .t-page-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 40px 60px;
+        }
+        .t-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+        }
+        .t-subject-card {
+            background: white;
+            border: 1px solid #E2E8F0;
+            border-radius: 16px;
+            padding: 22px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .t-subject-card:hover, .t-subject-card.active {
+            border-color: #4965E8;
+            box-shadow: 0 8px 24px rgba(73, 101, 232, 0.12);
+            transform: translateY(-2px);
+        }
+        .cluster-card {
+            background: white;
+            border: 1px solid #E2E8F0;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+        }
+        .cluster-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+        .cluster-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1E293B;
+            margin: 0 0 6px;
+        }
+        .cluster-student-badge {
+            background: #EFF6FF;
+            color: #2563EB;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .keyword-chip {
+            background: #F1F5F9;
+            color: #475569;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 6px;
+            display: inline-block;
+            margin-right: 6px;
+            margin-top: 4px;
+        }
+        .doubt-item {
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 12px;
+        }
+        .btn-answer {
+            background: #4965E8;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.2s;
+        }
+        .btn-answer:hover {
+            background: #3751D0;
+        }
+        .btn-answer.resolved {
+            background: #ECFDF5;
+            color: #059669;
+            border: 1px solid #A7F3D0;
+            cursor: default;
+        }
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-box {
+            background: white;
+            border-radius: 20px;
+            max-width: 650px;
+            width: 90%;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+    </style>
 </head>
 
 <body>
-
     <!-- SHARED SIDEBAR -->
     <div id="sidebar-container"></div>
 
-
     <!-- MAIN CONTENT -->
     <main class="main-content">
-
-        <!-- SHARED TOPBAR -->
-        <div id="topbar-container"></div>
-
-
-        <section class="dashboard-page">
-
-            <!-- =====================================
-                 WELCOME HEADER
-            ====================================== -->
-
-            <header class="dashboard-header">
-
-                <div>
-                    <h1 id="welcome-heading">
-                        Welcome back!
-                    </h1>
-
-                    <p>
-                        Here's an overview of your doubts and sessions.
-                    </p>
-                </div>
-
-                <a href="create-session.html" class="primary-button">
-                    <i data-lucide="calendar-plus"></i>
-                    Schedule a Session
-                </a>
-
-            </header>
-
-
-            <!-- =====================================
-                 STATISTICS
-            ====================================== -->
-
-            <section class="stats-grid" id="stats-grid">
-
-                <!-- Generated through JavaScript -->
-
-            </section>
-
-
-            <!-- =====================================
-                 MAIN DASHBOARD GRID
-            ====================================== -->
-
-            <div class="dashboard-grid">
-
-
-                <!-- =================================
-                     DOUBTS REQUIRING ATTENTION
-                ================================== -->
-
-                <section class="dashboard-card attention-card">
-
-                    <div class="card-header">
-
-                        <div class="card-heading">
-                            <div class="heading-icon purple">
-                                <i data-lucide="alert-circle"></i>
-                            </div>
-
-                            <div>
-                                <h2>Doubts Requiring Attention</h2>
-                                <p>Recent student doubts awaiting review.</p>
-                            </div>
-                        </div>
-
-                        <a href="doubt-inbox.html" class="view-all-link">
-                            View Inbox
-                            <i data-lucide="arrow-right"></i>
-                        </a>
-
-                    </div>
-
-
-                    <div class="attention-list" id="attention-list">
-
-                        <!-- Generated through JavaScript -->
-
-                    </div>
-
-                </section>
-
-
-
-                <!-- =================================
-                     ACTIVE DOUBT SESSIONS
-                ================================== -->
-
-                <section class="dashboard-card active-sessions-card">
-
-                    <div class="card-header">
-
-                        <div class="card-heading">
-                            <div class="heading-icon blue">
-                                <i data-lucide="radio"></i>
-                            </div>
-
-                            <div>
-                                <h2>Active Doubt Sessions</h2>
-                                <p>Sessions currently accepting doubts.</p>
-                            </div>
-                        </div>
-
-                        <a href="doubt-sessions.html" class="view-all-link">
-                            View All
-                            <i data-lucide="arrow-right"></i>
-                        </a>
-
-                    </div>
-
-
-                    <div class="active-sessions-list" id="active-sessions-list">
-
-                        <!-- Generated through JavaScript -->
-
-                    </div>
-
-                </section>
-
-
-
-                <!-- =================================
-                     UPCOMING SESSIONS
-                ================================== -->
-
-                <section class="dashboard-card upcoming-card">
-
-                    <div class="card-header">
-
-                        <div class="card-heading">
-                            <div class="heading-icon blue">
-                                <i data-lucide="calendar-days"></i>
-                            </div>
-
-                            <div>
-                                <h2>Upcoming Sessions</h2>
-                                <p>Your scheduled doubt-solving sessions.</p>
-                            </div>
-                        </div>
-
-                        <a href="doubt-sessions.html" class="view-all-link">
-                            View All
-                            <i data-lucide="arrow-right"></i>
-                        </a>
-
-                    </div>
-
-
-                    <div class="upcoming-list" id="upcoming-list">
-
-                        <!-- Generated through JavaScript -->
-
-                    </div>
-
-                </section>
-
-
-
-                <!-- =================================
-                     QUICK ACTIONS
-                ================================== -->
-
-                <section class="dashboard-card quick-actions-card">
-
-                    <div class="card-header">
-
-                        <div class="card-heading">
-                            <div class="heading-icon orange">
-                                <i data-lucide="zap"></i>
-                            </div>
-
-                            <div>
-                                <h2>Quick Actions</h2>
-                                <p>Jump straight into your workflow.</p>
-                            </div>
-                        </div>
-
-                    </div>
-
-
-                    <div class="quick-actions-grid">
-
-                        <a href="create-session.html" class="quick-action">
-                            <div class="quick-action-icon">
-                                <i data-lucide="calendar-plus"></i>
-                            </div>
-
-                            <span>
-                                Schedule<br>
-                                a Session
-                            </span>
-                        </a>
-
-
-                        <a href="doubt-inbox.html" class="quick-action">
-                            <div class="quick-action-icon">
-                                <i data-lucide="message-square"></i>
-                            </div>
-
-                            <span>
-                                Open Doubts<br>
-                                Inbox
-                            </span>
-                        </a>
-
-
-                        <a href="resolved-doubts.html" class="quick-action">
-                            <div class="quick-action-icon">
-                                <i data-lucide="check-circle"></i>
-                            </div>
-
-                            <span>
-                                View Resolved<br>
-                                Doubts
-                            </span>
-                        </a>
-
-                    </div>
-
-                </section>
-
-
+        <div class="t-page-container">
+        <!-- HEADER -->
+        <header class="t-header">
+            <div>
+                <h1 id="teacherGreeting" style="font-size: 28px; font-weight: 800; color: #1E293B; margin: 0 0 6px;">
+                    Welcome back!
+                </h1>
+                <p id="teacherSubtitle" style="font-size: 14px; color: #64748B; margin: 0;">
+                    Loading faculty profile...
+                </p>
             </div>
 
+            <div style="display: flex; gap: 12px; align-items: center;">
+                <button onclick="openTeacherProfileModal()" style="display: flex; align-items: center; gap: 10px; background: white; border: 1px solid #CBD5E1; padding: 10px 16px; border-radius: 12px; cursor: pointer;">
+                    <div id="tNavAvatar" style="width: 32px; height: 32px; border-radius: 50%; background: #4965E8; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px;">T</div>
+                    <span id="tNavName" style="font-size: 14px; font-weight: 600; color: #1E293B;">Faculty</span>
+                    <i data-lucide="chevron-down" style="width: 16px; height: 16px; color: #64748B;"></i>
+                </button>
+                <button onclick="handleLogout()" style="background: #FEE2E2; color: #DC2626; border: none; padding: 10px 16px; border-radius: 12px; font-weight: 600; font-size: 13px; cursor: pointer;">
+                    Log Out
+                </button>
+            </div>
+        </header>
 
-
-            <!-- =====================================
-                 RECENT ACTIVITY
-            ====================================== -->
-
-            <section class="dashboard-card recent-activity-card">
-
-                <div class="card-header">
-
-                    <div class="card-heading">
-                        <div class="heading-icon blue">
-                            <i data-lucide="activity"></i>
-                        </div>
-
-                        <div>
-                            <h2>Recent Activity</h2>
-                            <p>A quick look at recent updates.</p>
-                        </div>
-                    </div>
-
+        <!-- STATS GRID -->
+        <section class="stats-grid" style="margin-bottom: 30px;">
+            <div class="stat-card">
+                <div style="width: 48px; height: 48px; border-radius: 12px; background: #EEF2FF; color: #4965E8; display: flex; align-items: center; justify-content: center;">
+                    <i data-lucide="book-marked"></i>
                 </div>
-
-
-                <div class="activity-list" id="activity-list">
-
-                    <!-- Generated through JavaScript -->
-
+                <div>
+                    <p style="font-size: 13px; color: #64748B; margin: 0;">Assigned Subjects</p>
+                    <h3 id="statAssignedSubjects" style="font-size: 24px; font-weight: 700; color: #1E293B; margin: 2px 0 0;">0</h3>
                 </div>
+            </div>
 
-            </section>
+            <div class="stat-card">
+                <div style="width: 48px; height: 48px; border-radius: 12px; background: #EFF6FF; color: #2563EB; display: flex; align-items: center; justify-content: center;">
+                    <i data-lucide="message-square"></i>
+                </div>
+                <div>
+                    <p style="font-size: 13px; color: #64748B; margin: 0;">Total Doubts Received</p>
+                    <h3 id="statTotalDoubts" style="font-size: 24px; font-weight: 700; color: #1E293B; margin: 2px 0 0;">0</h3>
+                </div>
+            </div>
 
+            <div class="stat-card">
+                <div style="width: 48px; height: 48px; border-radius: 12px; background: #FEF3C7; color: #D97706; display: flex; align-items: center; justify-content: center;">
+                    <i data-lucide="clock"></i>
+                </div>
+                <div>
+                    <p style="font-size: 13px; color: #64748B; margin: 0;">Pending Verification</p>
+                    <h3 id="statPendingDoubts" style="font-size: 24px; font-weight: 700; color: #D97706; margin: 2px 0 0;">0</h3>
+                </div>
+            </div>
 
+            <div class="stat-card">
+                <div style="width: 48px; height: 48px; border-radius: 12px; background: #DCFCE7; color: #166534; display: flex; align-items: center; justify-content: center;">
+                    <i data-lucide="check-circle-2"></i>
+                </div>
+                <div>
+                    <p style="font-size: 13px; color: #64748B; margin: 0;">Resolved Doubts</p>
+                    <h3 id="statResolvedDoubts" style="font-size: 24px; font-weight: 700; color: #166534; margin: 2px 0 0;">0</h3>
+                </div>
+            </div>
         </section>
 
+        <!-- ==========================================
+             MY ASSIGNED SUBJECTS (CLICKABLE)
+        =========================================== -->
+        <section style="margin-bottom: 34px;">
+            <div style="margin-bottom: 16px;">
+                <h2 style="font-size: 20px; font-weight: 700; color: #1E293B; margin: 0 0 4px;">My Assigned Subjects</h2>
+                <p style="font-size: 13px; color: #64748B; margin: 0;">Select a subject to inspect student questions, AI topic clustering, and publish verified answers.</p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;" id="teacherSubjectsContainer">
+                <div style="grid-column: 1/-1; text-align: center; padding: 30px; background: white; border-radius: 16px; color: #94A3B8;">
+                    Loading assigned subjects...
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             SUBJECT-WISE DOUBT MANAGEMENT & AI CLUSTERING
+        =========================================== -->
+        <section id="subjectDetailsSection" style="display: none;">
+            <!-- AI OVERVIEW BANNER -->
+            <div style="background: linear-gradient(110deg, #F0F4FF, #E6EDFE); border: 1px solid #D5E2FC; border-radius: 18px; padding: 22px 28px; margin-bottom: 24px;">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                    <div style="width: 36px; height: 36px; border-radius: 50%; background: #4965E8; color: white; display: flex; align-items: center; justify-content: center;">
+                        <i data-lucide="sparkles" style="width: 20px; height: 20px;"></i>
+                    </div>
+                    <div>
+                        <h3 id="activeSubjectTitle" style="font-size: 18px; font-weight: 700; color: #1E293B; margin: 0;">Subject Doubts & AI Synthesis</h3>
+                        <span id="activeSubjectCode" style="font-size: 12px; color: #4965E8; font-weight: 700;">CODE</span>
+                    </div>
+                </div>
+                <p id="aiSubjectOverview" style="font-size: 14px; color: #334155; line-height: 1.6; margin: 0;">
+                    Synthesizing questions submitted by your classes...
+                </p>
+            </div>
+
+            <!-- CLUSTERED DOUBTS CONTAINER -->
+            <div id="clustersContainer">
+                <!-- Dynamically loaded clusters -->
+            </div>
+        </section>
+    </div>
+
+    <!-- ==========================================
+         HUMAN-IN-THE-LOOP ANSWER VERIFICATION MODAL
+    =========================================== -->
+    <div class="modal-overlay" id="answerModal">
+        <div class="modal-box">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h3 style="font-size: 18px; font-weight: 700; color: #1E293B; margin: 0;">Verify & Publish Academic Answer</h3>
+                <button onclick="closeAnswerModal()" style="background: none; border: none; cursor: pointer; color: #64748B;">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+
+            <!-- ANONYMOUS DOUBT PREVIEW -->
+            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 16px; margin-bottom: 18px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                    <span id="modalDoubtSubject" style="font-size: 11px; font-weight: 700; background: #EEF2FF; color: #4965E8; padding: 3px 8px; border-radius: 4px;">SUBJECT</span>
+                    <span style="font-size: 11px; color: #059669; font-weight: 600;">🛡️ 100% Anonymous Query</span>
+                </div>
+                <h4 id="modalDoubtTitle" style="font-size: 15px; font-weight: 600; color: #1E293B; margin: 0 0 6px;">Doubt Title</h4>
+                <p id="modalDoubtQuestion" style="font-size: 13px; color: #475569; margin: 0; line-height: 1.5;">Question description...</p>
+                <div id="modalStudentAttachments" style="margin-top: 10px;"></div>
+                <div id="modalAiSummaryBox" style="margin-top: 10px; padding: 8px 12px; background: #EFF6FF; border-radius: 8px; font-size: 12px; color: #1E40AF;">
+                    <strong>AI Analysis:</strong> <span id="modalAiSummary">-</span>
+                </div>
+            </div>
+
+            <!-- ANSWER FORM -->
+            <form id="verifyAnswerForm" onsubmit="handlePublishAnswer(event)">
+                <label style="display: block; font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 6px;">
+                    Teacher's Verified Explanation <span style="color: #DC2626;">*</span>
+                </label>
+                <textarea id="answerText" style="width: 100%; min-height: 140px; padding: 12px 14px; border: 1px solid #CBD5E1; border-radius: 10px; font-family: inherit; font-size: 14px; outline: none; margin-bottom: 12px;" placeholder="Write a step-by-step verified conceptual explanation or reference for the students..." required minlength="5"></textarea>
+
+                <label style="display: block; font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 6px;">
+                    Helpful Resource / Reference Link (Optional)
+                </label>
+                <input type="url" id="resourceLink" style="width: 100%; padding: 10px 14px; border: 1px solid #CBD5E1; border-radius: 10px; font-family: inherit; font-size: 13px; outline: none; margin-bottom: 14px;" placeholder="https://example.edu/lecture-notes-pointers.pdf" />
+
+                <label style="display: block; font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 6px;">
+                    📎 Attach Solution File <span style="font-weight: 400; color: #64748B;">(Optional — PNG, JPG, or PDF, max 10 MB)</span>
+                </label>
+                <input type="file" id="solutionFileInput" accept=".png,.jpg,.jpeg,.pdf" style="display: block; width: 100%; padding: 8px; border: 1px dashed #CBD5E1; border-radius: 8px; margin-bottom: 14px; font-size: 13px; cursor: pointer; background: #F8FAFC;" />
+                <div id="solutionFilePreview" style="font-size: 12px; color: #64748B; margin-bottom: 10px;"></div>
+
+                <div style="background: #F1F5F9; border-radius: 8px; padding: 10px 14px; margin-bottom: 18px; display: flex; align-items: center; gap: 8px;">
+                    <input type="checkbox" id="resolveClusterCheck" style="width: 16px; height: 16px; cursor: pointer;" checked />
+                    <label for="resolveClusterCheck" style="font-size: 13px; color: #334155; cursor: pointer; margin: 0;">
+                        <strong>Broadcast to topic group:</strong> Also resolve other questions in this cluster with this answer.
+                    </label>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                    <button type="button" onclick="closeAnswerModal()" style="padding: 10px 18px; background: #F1F5F9; color: #475569; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                        Cancel
+                    </button>
+                    <button type="submit" id="btnPublishAnswer" class="btn-answer" style="padding: 10px 22px;">
+                        <i data-lucide="check-circle" style="width: 16px; height: 16px;"></i>
+                        <span>Publish Verified Answer</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         TEACHER PROFILE MODAL
+    =========================================== -->
+    <div class="modal-overlay" id="teacherProfileModal">
+        <div class="modal-box" style="max-width: 500px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+                <h3 style="font-size: 18px; font-weight: 700; color: #1E293B; margin: 0;">Faculty Profile</h3>
+                <button onclick="closeTeacherProfileModal()" style="background: none; border: none; cursor: pointer; color: #64748B;">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+
+            <div style="background: #F8FAFC; border-radius: 12px; padding: 16px; margin-bottom: 18px;">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px;">
+                    <div id="tProfileAvatar" style="width: 46px; height: 46px; border-radius: 50%; background: #4965E8; color: white; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700;">T</div>
+                    <div>
+                        <h4 id="tProfileName" style="font-size: 16px; font-weight: 700; color: #1E293B; margin: 0;">Faculty Name</h4>
+                        <p id="tProfileId" style="font-size: 12px; color: #64748B; margin: 2px 0 0;">ID: TCH-0000</p>
+                    </div>
+                </div>
+                <div style="font-size: 13px; color: #475569;">
+                    <p style="margin: 4px 0;"><strong>Department:</strong> <span id="tProfileDept">-</span></p>
+                    <p style="margin: 4px 0;"><strong>Designation:</strong> <span id="tProfileDesig">-</span></p>
+                </div>
+            </div>
+
+            <form onsubmit="handleTeacherProfileUpdate(event)">
+                <label style="display: block; font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 6px;">Full Name</label>
+                <input type="text" id="tEditName" style="width: 100%; padding: 10px 14px; border: 1px solid #CBD5E1; border-radius: 10px; font-size: 14px; outline: none; margin-bottom: 12px;" required />
+
+                <label style="display: block; font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 6px;">Email Address</label>
+                <input type="email" id="tEditEmail" style="width: 100%; padding: 10px 14px; border: 1px solid #CBD5E1; border-radius: 10px; font-size: 14px; outline: none; margin-bottom: 12px;" required />
+
+                <label style="display: block; font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 6px;">Designation</label>
+                <input type="text" id="tEditDesig" style="width: 100%; padding: 10px 14px; border: 1px solid #CBD5E1; border-radius: 10px; font-size: 14px; outline: none; margin-bottom: 16px;" required />
+
+                <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                    <button type="button" onclick="closeTeacherProfileModal()" style="padding: 10px 16px; background: #F1F5F9; color: #475569; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn-answer" style="padding: 10px 20px;">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
     </main>
 
+    <!-- LUCIDE ICONS & SHARED COMPONENTS -->
+    <script src="../teacher-js/components.js" defer></script>
+    <!-- TEACHER DASHBOARD SCRIPT -->
+    <script src="../teacher-js/dashboard.js"></script>
 </body>
-
 </html>

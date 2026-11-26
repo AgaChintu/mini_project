@@ -1,25 +1,186 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard | ClariQ</title>
     <link rel="stylesheet" href="../student-css/common.css">
     <link rel="stylesheet" href="../student-css/dashboard.css">
     <script src="https://unpkg.com/lucide@latest"></script>
-
+    <style>
+        .subjects-section {
+            margin-bottom: 30px;
+        }
+        .subjects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 16px;
+            margin-top: 14px;
+        }
+        .subject-card {
+            background: white;
+            border: 1px solid #E2E8F0;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .subject-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(65, 101, 255, 0.08);
+            border-color: #CBD5E1;
+        }
+        .subject-code-badge {
+            display: inline-block;
+            background: #EEF2FF;
+            color: #4F46E5;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            letter-spacing: 0.5px;
+        }
+        .subject-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1E293B;
+            margin-bottom: 6px;
+        }
+        .subject-faculty {
+            font-size: 13px;
+            color: #64748B;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+        .subject-card-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: auto;
+        }
+        .btn-sub-ask {
+            flex: 1;
+            padding: 8px 12px;
+            background: #4165FF;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+        .btn-sub-ask:hover {
+            background: #3251D4;
+        }
+        .btn-sub-view {
+            padding: 8px 12px;
+            background: #F1F5F9;
+            color: #475569;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-sub-view:hover {
+            background: #E2E8F0;
+        }
+        .verified-answer-box {
+            background: #F8FAFC;
+            border-left: 3px solid #10B981;
+            padding: 12px 14px;
+            border-radius: 0 8px 8px 0;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+        .verified-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: #059669;
+            font-size: 11px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            max-width: 520px;
+            width: 90%;
+            padding: 28px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 6px;
+        }
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #CBD5E1;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+            margin-bottom: 14px;
+        }
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        .anon-shield-banner {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #EFF6FF;
+            border: 1px solid #BFDBFE;
+            color: #1E40AF;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-bottom: 16px;
+        }
+    </style>
 </head>
 
 <body>
 
-
+    <!-- SIDEBAR -->
     <nav class="sidebar">
         <img src="../assets/images/clariq-logo.svg" alt="ClariQ Logo" class="logo">
         <ul>
             <li>
                 <a href="dashboard.html" class="nav-item-active">
                     <i data-lucide="house"></i>
-                    <span>Home</span>
+                    <span>Dashboard</span>
                 </a>
             </li>
             <li>
@@ -29,9 +190,15 @@
                 </a>
             </li>
             <li>
-                <a href="my-doubts.html">
+                <a href="#myDoubtsSection">
                     <i data-lucide="message-circle"></i>
                     <span>My Doubts</span>
+                </a>
+            </li>
+            <li>
+                <a href="ai-chatbot.html">
+                    <i data-lucide="bot"></i>
+                    <span>AI Chatbot</span>
                 </a>
             </li>
             <li>
@@ -40,339 +207,345 @@
                     <span>Library</span>
                 </a>
             </li>
-            <li>
-                <a href="doubt-sessions.html">
-                    <i data-lucide="messages-square"></i>
-                    <span>Doubt Sessions</span>
-                </a>
-            </li>
-        
-            <li>
-                <a href="saves.html">
-                    <i data-lucide="bookmark"></i>
-                    <span>Saves</span>
-                </a>
-
-            </li>
         </ul>
 
-
         <div class="anonymous-box">
-
             <img src="../assets/icons/anonymous-icon.svg" alt="Anonymous Icon" class="anonymous-icon">
-
             <div class="anonymous-text">
                 <h3>Ask Freely, Stay Anonymous</h3>
-                <p>Your identity stays protected when you ask a doubt.</p>
+                <p>Your name & ID are never revealed to teachers.</p>
             </div>
-
-
-
-
-
         </div>
-
-
-
-
-
     </nav>
 
+    <!-- TOPBAR / PROFILE BUTTON -->
     <div class="top-right">
-
-        <button class="notification-btn">
-            <i data-lucide="bell"></i>
-        </button>
-
-        <button class="profile-btn">
-            <span class="avatar">A</span>
-            <span>Anushka</span>
+        <button class="profile-btn" onclick="openProfileModal()">
+            <span class="avatar" id="navAvatar">S</span>
+            <span id="navStudentName">Student</span>
             <i data-lucide="chevron-down"></i>
-
-
         </button>
-
     </div>
 
-
-
-
-
-
-
-
-
-
+    <!-- MAIN CONTENT -->
     <main>
+        <!-- DYNAMIC WELCOME HEADER -->
         <header class="page-title">
-            <h1>Good Evening, Anushka</h1>
-            <h2>Here's what happening with your doubts.</h2>
-
+            <h1 id="welcomeGreeting">Welcome back!</h1>
+            <h2 id="welcomeSubtitle">Loading academic profile...</h2>
         </header>
 
-        <!-- Ask a Doubt banner -->
-
+        <!-- ASK A DOUBT BANNER -->
         <section class="ask-doubt-banner">
             <div class="doubt-icon">
                 <i data-lucide="message-circle-more"></i>
-
             </div>
             <div class="doubt-content">
                 <h3>What are you stuck on?</h3>
-                <p>Ask freely, get help from your teacher anonymously.</p>
-
+                <p>Ask freely. Questions are submitted 100% anonymously to your faculty.</p>
             </div>
-            <a href="ask-doubt.html" class="doubt-btn">
-                Ask a Doubt
+            <button class="doubt-btn" onclick="openAskDoubtModal()" style="border:none; cursor:pointer;">
+                <span>Ask a Doubt</span>
                 <i data-lucide="arrow-right"></i>
-            </a>
-
+            </button>
         </section>
 
-
-        <!-- Three-column dashboard area -->
-
+        <!-- STATS & OVERVIEW GRID -->
         <div class="dashboard-grid">
-
-            <section class="upcoming-sessions">
-                <div class="section-header">
-                    <h2>Upcoming Sessions</h2>
-                    <a href="doubt-sessions.html">View All <i data-lucide="arrow-right"></i></a>
-                </div>
-
-                <div class="session-list">
-
-                    <div class="session-card">
-
-                        <div class="subj-icon">
-                            <img src="../assets/icons/dsa-icon.svg" alt="DSA">
-
-                        </div>
-
-                        <div class="subj-info">
-                            <h3>DSA — Tress & Graphs</h3>
-                            <p>Tomorrow — 2:00 PM</p>
-                            <p>Dr. Dhaka</p>
-
-                        </div>
-
-
-                    </div>
-
-                </div>
-
-
-            </section>
-
-
-
-            <section class="my-doubts">
-
-                <div class="section-header">
-                    <h2>My Doubts</h2>
-                    <a href="doubt-sessions.html">View All <i data-lucide="arrow-right"></i></a>
-                </div>
-
-                <div class="my-doubts-list">
-
-                    <div class="my-doubts-card">
-
-                        <div class="subj-icon">
-                            <img src="../assets/icons/coa-icon.svg" alt="DSA">
-
-                        </div>
-
-                        <div class="subj-info">
-                            <h3 class="doubt-title">Pipelining</h3>
-
-                            <div class="doubt-meta">
-                                <span class="subject">COA</span>
-                                <span class="separator">•</span>
-                                <span class="subject-teacher">Prof.Kamran</span>
-
-                            </div>
-
-                        </div>
-
-                        <div class="doubt-status-meta">
-
-                            <div class="status">
-
-                                <p>Resolved</p>
-                            </div>
-
-
-
-                        </div>
-
-
-                    </div>
-
-                </div>
-
-
-            </section>
-
-
-
-            <section class="doubt-statistics">
-
+            <section class="doubt-statistics" style="grid-column: 1 / -1; margin-bottom: 24px;">
                 <div class="learning-overview">
-                    <h3>Learning Overview</h3>
-                    <p>A quick look at your progress</p>
-
-                    <div class="stat-card">
-                        <div class="stat-icon">
-                            <i data-lucide="message-circle-question"></i>
-                        </div>
-
-                        <div class="stat-info">
-                            <p>Doubts submitted</p>
-                            <h3 id="doubts-submitted">12</h3>
-                            <span>↑ +3 this week</span>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <div>
+                            <h3>Academic Progress</h3>
+                            <p id="statsSubtitle">Doubt metrics for current semester</p>
                         </div>
                     </div>
 
-                    <div class="stat-card">
-                        <div class="stat-icon">
-                            <i data-lucide="user-round"></i>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background:#EFF6FF; color:#3B82F6;">
+                                <i data-lucide="message-circle-question"></i>
+                            </div>
+                            <div class="stat-info">
+                                <p>Total Doubts</p>
+                                <h3 id="statTotalDoubts">0</h3>
+                                <span>Submitted by you</span>
+                            </div>
                         </div>
 
-                        <div class="stat-info">
-                            <p>Teacher responses</p>
-                            <h3 id="teacher-responses">08</h3>
-                            <span>↑ +2 this week</span>
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background:#FEF3C7; color:#D97706;">
+                                <i data-lucide="clock"></i>
+                            </div>
+                            <div class="stat-info">
+                                <p>Pending Review</p>
+                                <h3 id="statPendingDoubts">0</h3>
+                                <span>Awaiting teacher</span>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="stat-card">
-                        <div class="stat-icon">
-                            <i data-lucide="star"></i>
-                        </div>
-
-                        <div class="stat-info">
-                            <p>Shared with class</p>
-                            <h3 id="shared-doubts">03</h3>
-                            <span>↑ +1 this week</span>
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background:#ECFDF5; color:#059669;">
+                                <i data-lucide="check-circle-2"></i>
+                            </div>
+                            <div class="stat-info">
+                                <p>Verified Answers</p>
+                                <h3 id="statResolvedDoubts">0</h3>
+                                <span>Answered by faculty</span>
+                            </div>
                         </div>
                     </div>
                 </div>
-
-
             </section>
-
-
-
         </div>
 
-
-
-
-        <section class="exam-support">
-
-            <!-- LEFT SIDE -->
-            <div class="exam-info">
-
-                <div class="exam-icon">
-                    <i data-lucide="graduation-cap"></i>
+        <!-- ==========================================
+             MY SUBJECTS SECTION
+        =========================================== -->
+        <section class="subjects-section">
+            <div class="section-header" style="display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <h2 style="font-size:20px; font-weight:700; color:#1E293B;" id="mySubjectsHeading">My Enrolled Subjects</h2>
+                    <p style="font-size:13px; color:#64748B;" id="mySubjectsSubtitle">Curriculum assigned to your semester</p>
                 </div>
-
-                <div class="exam-details">
-
-                    <div class="exam-heading">
-                        <h3>Exam Support</h3>
-                        <span class="exam-status">Active</span>
-                    </div>
-
-                    <p class="exam-name">Mid-Sem Examination</p>
-
-                    <p class="exam-subjects">DBMS • CN • DSA</p>
-
-                </div>
-
             </div>
 
-            <!-- DIVIDER -->
-            <div class="exam-divider"></div>
-
-            <!-- RIGHT SIDE -->
-            <div class="exam-actions">
-
-                <div class="exam-deadline">
-
-                    <div class="deadline-icon">
-                        <i data-lucide="calendar-days"></i>
-                    </div>
-
-                    <div class="deadline-details">
-                        <p class="deadline-label">Doubts accepted until</p>
-                        <p class="deadline-time">25 Aug · 11:59 PM</p>
-                    </div>
-
+            <div class="subjects-grid" id="mySubjectsGrid">
+                <!-- Dynamically loaded from database -->
+                <div style="grid-column: 1 / -1; text-align: center; padding: 24px; color: #94A3B8;">
+                    Loading enrolled subjects...
                 </div>
+            </div>
+        </section>
 
-                <a href="exam-support.html" class="exam-button">
-                    View Details
-                    <i data-lucide="arrow-right"></i>
+        <!-- ==========================================
+             RECENT STUDY MATERIALS & ACADEMIC FILES
+        =========================================== -->
+        <section class="resources-section" style="margin-top: 32px;">
+            <div class="section-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
+                <div>
+                    <h2 style="font-size:20px; font-weight:700; color:#1E293B;">Recent Faculty Study Materials</h2>
+                    <p style="font-size:13px; color:#64748B;">Latest syllabus notes, PDFs, and video references uploaded by your subject faculties</p>
+                </div>
+                <a href="library.html" class="btn-sub-view" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px; font-weight:600;">
+                    <i data-lucide="book-open" style="width:14px; height:14px;"></i>
+                    <span>Open Library</span>
+                    <i data-lucide="arrow-right" style="width:14px; height:14px;"></i>
                 </a>
-
             </div>
 
+            <div id="recentResourcesGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px;">
+                <div style="grid-column: 1 / -1; text-align: center; padding: 24px; color: #94A3B8; background: white; border-radius: 16px;">
+                    Loading recent materials...
+                </div>
+            </div>
         </section>
 
-
-        <section class="shared-doubts">
-
-            <div class="shared-doubts-header">
-
-                <i data-lucide="star"></i>
-
-                <div class="shared-doubts-heading">
-                    <h3>Shared Doubts</h3>
-                    <p>Useful doubts shared with the class</p>
+        <!-- ==========================================
+             MY DOUBTS & VERIFIED RESPONSES SECTION
+        =========================================== -->
+        <section class="my-doubts-section" id="myDoubtsSection" style="margin-top: 32px;">
+            <div class="section-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
+                <div>
+                    <h2 style="font-size:20px; font-weight:700; color:#1E293B;">My Doubts & Responses</h2>
+                    <p style="font-size:13px; color:#64748B;">Track verification status and view teacher answers</p>
                 </div>
-
+                <div style="display:flex; gap:8px;">
+                    <button class="btn-sub-view" id="filterAll" onclick="filterDoubts('all')">All</button>
+                    <button class="btn-sub-view" id="filterPending" onclick="filterDoubts('pending')">Pending</button>
+                    <button class="btn-sub-view" id="filterResolved" onclick="filterDoubts('resolved')">Answered</button>
+                </div>
             </div>
 
-            <div class="shared-doubts-list">
-
-                <div class="shared-doubt-card">
-
-                    <div class="shared-doubt-icon">
-                        <img src="../assets/icons/dstl-icon.svg" alt="">
-                    </div>
-
-                    <div class="shared-doubt-info">
-                        <p class="shared-doubt-question">
-                            How can we determine whether a partially ordered set (poset) forms a lattice?
-                        </p>
-
-                        <div class="shared-doubt-meta">
-                            <span class="doubt-subject">DSTL</span>
-                            <span class="meta-separator">•</span>
-                            <span class="doubt-teacher">Prof. Kamlendra</span>
-                        </div>
-                    </div>
-
-                    <a href="#" class="shared-doubt-link">
-                        View Doubt
-                        <i data-lucide="arrow-right"></i>
-                    </a>
-
+            <div id="myDoubtsContainer" style="display: flex; flex-direction: column; gap: 14px;">
+                <!-- Populated dynamically -->
+                <div style="text-align: center; padding: 30px; color: #94A3B8; background: white; border-radius: 16px;">
+                    Loading doubts...
                 </div>
-
-                </div>
+            </div>
         </section>
-
-
     </main>
 
+    <!-- ==========================================
+         ANONYMOUS DOUBT SUBMISSION MODAL
+    =========================================== -->
+    <div class="modal-overlay" id="askDoubtModal">
+        <div class="modal-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h3 style="font-size: 18px; font-weight: 700; color: #1E293B;">Ask Anonymous Doubt</h3>
+                <button onclick="closeAskDoubtModal()" style="background: none; border: none; cursor: pointer; color: #64748B;">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
 
+            <div class="anon-shield-banner">
+                <i data-lucide="shield-check" style="flex-shrink:0;"></i>
+                <span><strong>100% Anonymous:</strong> Your name and Student ID are completely hidden from the faculty. Only the doubt content is visible.</span>
+            </div>
 
+            <form id="askDoubtForm" onsubmit="handleDoubtSubmit(event)">
+                <label class="form-label" for="doubtSubjectSelect">Subject</label>
+                <select id="doubtSubjectSelect" class="form-select" onchange="handleSubjectChange(this.value)" required>
+                    <option value="">Select an enrolled subject...</option>
+                </select>
 
-    <script>
-        lucide.createIcons();
-    </script>
+                <div id="facultySelectGroup" style="display: none; margin-bottom: 14px;">
+                    <label class="form-label" for="doubtTeacherSelect">Select Faculty (Optional)</label>
+                    <select id="doubtTeacherSelect" class="form-select">
+                        <option value="">Default (Assigned Primary Faculty)</option>
+                    </select>
+                    <span style="font-size: 11px; color: #64748B;">You can route your question to a specific faculty or leave as default.</span>
+                </div>
+
+                <label class="form-label" for="doubtTitle">Doubt Title / Short Question</label>
+                <input type="text" id="doubtTitle" class="form-input" placeholder="e.g. Difference between B-Tree and B+ Tree" required minlength="4" />
+
+                <label class="form-label" for="doubtDescription">Detailed Explanation of Confusion</label>
+                <textarea id="doubtDescription" class="form-textarea" placeholder="Explain what concept you find difficult, where you get stuck, or the code error..." required minlength="10"></textarea>
+
+                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+                    <button type="button" class="btn-sub-view" onclick="closeAskDoubtModal()">Cancel</button>
+                    <button type="submit" id="btnSubmitDoubt" class="btn-sub-ask" style="padding: 10px 20px;">
+                        <span>Submit Anonymously</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         PROFILE & SETTINGS MODAL
+    =========================================== -->
+    <div class="modal-overlay" id="profileModal">
+        <div class="modal-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="font-size: 18px; font-weight: 700; color: #1E293B;">Student Profile & Settings</h3>
+                <button onclick="closeProfileModal()" style="background: none; border: none; cursor: pointer; color: #64748B;">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+
+            <div style="background: #F8FAFC; border-radius: 12px; padding: 16px; margin-bottom: 20px;">
+                <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 12px;">
+                    <div id="modalAvatar" style="width: 50px; height: 50px; border-radius: 50%; background: #4165FF; color: white; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700;">S</div>
+                    <div>
+                        <h4 id="modalName" style="font-size: 16px; font-weight: 700; color: #1E293B; margin: 0;">Student Name</h4>
+                        <p id="modalCollegeId" style="font-size: 13px; color: #64748B; margin: 2px 0 0;">ID: STU-0000</p>
+                    </div>
+                </div>
+                <div style="font-size: 13px; color: #475569; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                    <div><strong>Department:</strong> <span id="modalDept">-</span></div>
+                    <div><strong>Semester:</strong> <span id="modalSem">-</span></div>
+                    <div><strong>Section:</strong> <span id="modalSec">-</span></div>
+                    <div><strong>Year:</strong> <span id="modalYear">-</span></div>
+                </div>
+            </div>
+
+            <form id="profileUpdateForm" onsubmit="handleProfileUpdate(event)">
+                <label class="form-label" for="editFullName">Update Full Name</label>
+                <input type="text" id="editFullName" class="form-input" required />
+
+                <label class="form-label" for="editEmail">Email Address</label>
+                <input type="email" id="editEmail" class="form-input" required />
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                    <button type="button" onclick="handleLogout()" style="background: #FEE2E2; color: #DC2626; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                        Log Out
+                    </button>
+                    <button type="submit" id="btnSaveProfile" class="btn-sub-ask" style="padding: 10px 20px;">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         SUBJECT DOUBTS MODAL
+    =========================================== -->
+    <div class="modal-overlay" id="subjectDoubtsModal">
+        <div class="modal-content" style="max-width: 650px; max-height: 85vh; display: flex; flex-direction: column;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <div>
+                    <h3 id="subjectDoubtsModalTitle" style="font-size: 18px; font-weight: 700; color: #1E293B;">Subject Doubts</h3>
+                    <p id="subjectDoubtsModalSub" style="font-size: 13px; color: #64748B;">Doubts you have submitted for this subject</p>
+                </div>
+                <button onclick="closeSubjectDoubtsModal()" style="background: none; border: none; cursor: pointer; color: #64748B;">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div id="subjectDoubtsList" style="overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 12px; padding-right: 4px; min-height: 120px;">
+                <!-- Rendered dynamically -->
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px; padding-top: 12px; border-top: 1px solid #E2E8F0;">
+                <button type="button" class="btn-sub-view" onclick="closeSubjectDoubtsModal()">Close</button>
+                <button type="button" id="btnAskSubjectDoubt" class="btn-sub-ask" style="padding: 8px 16px;">
+                    <i data-lucide="plus" style="width:14px; height:14px;"></i>
+                    <span>Ask New Doubt</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         DOUBT DETAIL MODAL
+    =========================================== -->
+    <div class="modal-overlay" id="doubtDetailModal">
+        <div class="modal-content" style="max-width: 680px; max-height: 85vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span id="detailDoubtStatus" class="subject-code-badge">Status</span>
+                    <span id="detailDoubtCode" style="font-size: 13px; color: #64748B; font-weight: 600;">DOUBT-000</span>
+                </div>
+                <button onclick="closeDoubtDetailModal()" style="background: none; border: none; cursor: pointer; color: #64748B;">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+
+            <!-- Section 1: Doubt Info -->
+            <div style="margin-bottom: 20px;">
+                <h3 id="detailDoubtTitle" style="font-size: 18px; font-weight: 700; color: #1E293B; margin-bottom: 8px;">Doubt Title</h3>
+                <div style="font-size: 13px; color: #64748B; margin-bottom: 12px; display: flex; gap: 16px;">
+                    <span>Subject: <strong id="detailDoubtSubject">-</strong></span>
+                    <span>Submitted: <span id="detailDoubtDate">-</span></span>
+                </div>
+                <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 14px; font-size: 14px; color: #334155; line-height: 1.6;" id="detailDoubtDesc">
+                    Description goes here...
+                </div>
+            </div>
+
+            <!-- Section 2: Assigned Faculty Info -->
+            <div style="margin-bottom: 20px; background: #F1F5F9; border-radius: 12px; padding: 14px;">
+                <div style="font-size: 12px; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 6px;">Assigned Faculty</div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 38px; height: 38px; border-radius: 50%; background: #4F46E5; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700;">
+                        <i data-lucide="user" style="width: 18px; height: 18px;"></i>
+                    </div>
+                    <div>
+                        <h4 id="detailFacultyName" style="font-size: 15px; font-weight: 600; color: #1E293B; margin: 0;">Faculty Name</h4>
+                        <p id="detailFacultyDept" style="font-size: 12px; color: #64748B; margin: 2px 0 0;">Department / Designation</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 3: Verified Answer -->
+            <div>
+                <div style="font-size: 12px; font-weight: 700; color: #059669; text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                    <i data-lucide="badge-check" style="width: 16px; height: 16px;"></i>
+                    <span>Faculty Verified Answer</span>
+                </div>
+                <div id="detailAnswerContainer">
+                    <!-- Answer or awaiting message -->
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
+                <button type="button" class="btn-sub-view" onclick="closeDoubtDetailModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DASHBOARD SCRIPT -->
+    <script src="../student-js/dashboard.js"></script>
 </body>
-
 </html>

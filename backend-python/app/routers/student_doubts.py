@@ -15,7 +15,8 @@ from fastapi import (
     Form,
 )
 
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
+from app.services.storage import storage_service
 
 from fastapi.security import (
     HTTPBearer,
@@ -445,8 +446,8 @@ async def submit_doubt(
     title: str = Form(...),
     description: str = Form(...),
     subject_id: int = Form(...),
-    teacher_id: int = Form(...),
-    subtopic_ids: str = Form(...),
+    teacher_id: int = Form(0),
+    subtopic_ids: str = Form(""),
     files: List[UploadFile] = File(default=[]),
 
     student: Student = Depends(student_dependency),
@@ -515,8 +516,25 @@ async def submit_doubt(
     )
 
     # --------------------------------------------------
-    # VALIDATE SUBJECT
+    # VALIDATE SUBJECT & SEMESTER ELIGIBILITY
     # --------------------------------------------------
+
+    effective_semester = student.current_semester
+    if effective_semester is None and student.section and student.section.semester:
+        effective_semester = student.section.semester.semester_number
+
+    if not effective_semester:
+        raise HTTPException(
+            status_code=400,
+            detail="Your academic semester has not been assigned yet. Please contact your administrator.",
+        )
+
+    target_subject = db.query(Subject).filter(Subject.id == subject_id).first()
+    if target_subject and target_subject.semester_number is not None and target_subject.semester_number != effective_semester:
+        raise HTTPException(
+            status_code=400,
+            detail=f"You cannot submit a doubt for a subject outside your current semester (Semester {effective_semester}).",
+        )
 
     semester = get_student_semester(
         db,
@@ -556,6 +574,20 @@ async def submit_doubt(
     # VALIDATE TEACHER ASSIGNMENT
     # --------------------------------------------------
 
+    if teacher_id == 0:
+        # Auto-pick the first assigned teacher for this subject
+        auto_assignment = db.query(TeacherAssignment).filter(
+            TeacherAssignment.section_id == student.section_id,
+            TeacherAssignment.semester_id == semester.id,
+            TeacherAssignment.subject_id == subject_id,
+        ).first()
+        if not auto_assignment:
+            raise HTTPException(
+                status_code=400,
+                detail="No faculty is assigned to this subject. Please contact your administrator.",
+            )
+        teacher_id = auto_assignment.teacher_id
+
     teacher_assignment = db.query(TeacherAssignment).filter(
         TeacherAssignment.teacher_id == teacher_id,
         TeacherAssignment.section_id == student.section_id,
@@ -586,29 +618,32 @@ async def submit_doubt(
     # VALIDATE SUBTOPICS
     # --------------------------------------------------
 
-    selected_subtopics = (
-        db.query(SyllabusSubtopic)
-        .join(
-            SyllabusTopic,
-            SyllabusTopic.id == SyllabusSubtopic.topic_id,
+    if not selected_subtopic_ids:
+        # Allow submission without subtopics (optional)
+        selected_subtopics = []
+    else:
+        selected_subtopics = (
+            db.query(SyllabusSubtopic)
+            .join(
+                SyllabusTopic,
+                SyllabusTopic.id == SyllabusSubtopic.topic_id,
+            )
+            .join(
+                SyllabusUnit,
+                SyllabusUnit.id == SyllabusTopic.unit_id,
+            )
+            .filter(
+                SyllabusSubtopic.id.in_(selected_subtopic_ids),
+                SyllabusUnit.subject_id == subject_id,
+            )
+            .all()
         )
-        .join(
-            SyllabusUnit,
-            SyllabusUnit.id == SyllabusTopic.unit_id,
-        )
-        .filter(
-            SyllabusSubtopic.id.in_(selected_subtopic_ids),
-            SyllabusUnit.subject_id == subject_id,
-        )
-        .all()
-    )
 
-    if len(selected_subtopics) != len(selected_subtopic_ids):
-
-        raise HTTPException(
-            status_code=400,
-            detail="One or more selected subtopics do not belong to this subject.",
-        )
+        if len(selected_subtopics) != len(selected_subtopic_ids):
+            raise HTTPException(
+                status_code=400,
+                detail="One or more selected subtopics do not belong to this subject.",
+            )
 
     # --------------------------------------------------
     # VALIDATE ATTACHMENTS
@@ -643,7 +678,7 @@ async def submit_doubt(
 
     doubt_code = str(uuid.uuid4())
 
-    first_subtopic = selected_subtopics[0]
+    first_subtopic = selected_subtopics[0] if selected_subtopics else None
 
     # The existing database has one question column.
     # Store the title and explanation together.
@@ -663,9 +698,9 @@ async def submit_doubt(
 
         teacher_id=teacher_id,
 
-        topic_id=first_subtopic.topic_id,
+        topic_id=first_subtopic.topic_id if first_subtopic else None,
 
-        subtopic_id=first_subtopic.id,
+        subtopic_id=first_subtopic.id if first_subtopic else None,
 
         question=complete_question,
 
@@ -712,37 +747,22 @@ async def submit_doubt(
             if not contents:
                 continue
 
-            safe_extension = Path(
-                file.filename
-            ).suffix.lower()
-
-            stored_filename = (
-                f"{uuid.uuid4().hex}{safe_extension}"
+            meta = storage_service.upload_file_bytes(
+                file_bytes=contents,
+                original_filename=file.filename,
+                content_type=file.content_type,
+                subfolder="doubts",
             )
 
-            storage_path = UPLOAD_DIR / stored_filename
-
-            with open(storage_path, "wb") as output_file:
-
-                output_file.write(contents)
-
-            saved_paths.append(storage_path)
+            saved_paths.append(meta["storage_path"])
 
             attachment = Attachment(
                 doubt_id=doubt.id,
-
-                original_filename=Path(
-                    file.filename
-                ).name,
-
-                stored_filename=stored_filename,
-
-                mime_type=file.content_type,
-
-                file_size=len(contents),
-
-                storage_path=str(storage_path),
-
+                original_filename=meta["original_filename"],
+                stored_filename=meta["stored_filename"],
+                mime_type=meta["mime_type"],
+                file_size=meta["file_size"],
+                storage_path=meta["storage_path"],
                 uploaded_at=datetime.now(),
             )
 
@@ -757,9 +777,8 @@ async def submit_doubt(
         db.rollback()
 
         for path in saved_paths:
-
             try:
-                path.unlink(missing_ok=True)
+                storage_service.delete_file(path)
             except Exception:
                 pass
 
@@ -815,17 +834,18 @@ def download_attachment(
             detail="Attachment not found.",
         )
 
-    path = Path(attachment.storage_path)
-
-    if not path.exists():
-
+    try:
+        file_bytes = storage_service.download_file_bytes(attachment.storage_path)
+    except Exception:
         raise HTTPException(
             status_code=404,
-            detail="Attachment file is missing.",
+            detail="Attachment file is missing or unavailable.",
         )
 
-    return FileResponse(
-        path=str(path),
-        filename=attachment.original_filename,
+    return Response(
+        content=file_bytes,
         media_type=attachment.mime_type,
+        headers={
+            "Content-Disposition": f'attachment; filename="{attachment.original_filename}"'
+        },
     )

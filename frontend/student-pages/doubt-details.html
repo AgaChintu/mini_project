@@ -63,9 +63,9 @@
             </li>
 
             <li>
-                <a href="doubt-sessions.html">
-                    <i data-lucide="messages-square"></i>
-                    <span>Doubt Sessions</span>
+                <a href="ai-chatbot.html">
+                    <i data-lucide="bot"></i>
+                    <span>AI Chatbot</span>
                 </a>
             </li>
 
@@ -94,17 +94,11 @@
 
     <!-- TOP RIGHT -->
     <div class="top-right">
-
-        <button class="notification-btn">
-            <i data-lucide="bell"></i>
-        </button>
-
-        <button class="profile-btn">
-            <span class="avatar">A</span>
-            <span>Anushka</span>
+        <button class="profile-btn" onclick="window.location.href='dashboard.html'">
+            <span class="avatar" id="detailTopAvatar">S</span>
+            <span id="detailTopName">Student</span>
             <i data-lucide="chevron-down"></i>
         </button>
-
     </div>
 
 
@@ -193,7 +187,7 @@
 
                 <!-- STUDENT ATTACHMENTS -->
 
-                <div class="student-attachments" id="studentAttachments">
+                <div class="student-attachments" id="studentAttachments" style="display:none;">
 
                     <!-- IMAGE GALLERY -->
 
@@ -216,6 +210,31 @@
 
                 </div>
 
+            </section>
+
+            <!-- ASSIGNED FACULTY CARD -->
+            <section class="faculty-card" style="background:white; border-radius:16px; padding:20px; border:1px solid #E2E8F0; margin-top:20px;">
+                <div style="font-size:12px; font-weight:700; color:#64748B; text-transform:uppercase; margin-bottom:10px;">Assigned Faculty</div>
+                <div style="display:flex; align-items:center; gap:14px;">
+                    <div style="width:44px; height:44px; border-radius:50%; background:#4F46E5; color:white; display:flex; align-items:center; justify-content:center; font-weight:700;">
+                        <i data-lucide="user" style="width:20px; height:20px;"></i>
+                    </div>
+                    <div>
+                        <h3 id="assignedFacultyName" style="font-size:16px; font-weight:600; color:#1E293B; margin:0;">Loading faculty...</h3>
+                        <p id="assignedFacultyDept" style="font-size:13px; color:#64748B; margin:2px 0 0;">Department</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VERIFIED ANSWER SECTION -->
+            <section id="verifiedAnswerSection" style="background:white; border-radius:16px; padding:24px; border:1px solid #E2E8F0; margin-top:20px;">
+                <div style="font-size:13px; font-weight:700; color:#059669; text-transform:uppercase; margin-bottom:12px; display:flex; align-items:center; gap:6px;">
+                    <i data-lucide="badge-check" style="width:18px; height:18px;"></i>
+                    <span>Faculty Verified Answer</span>
+                </div>
+                <div id="verifiedAnswerContent">
+                    <p style="color:#64748B; font-size:14px;">Loading answer...</p>
+                </div>
             </section>
 
 

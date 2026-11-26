@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create ClariQ Account | Register</title>
+    <link rel="stylesheet" href="../student-css/login.css">
+    <link rel="stylesheet" href="../student-css/common.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .role-tabs {
+            display: flex;
+            background: #F1F5F9;
+            padding: 4px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            gap: 4px;
+        }
+        .role-tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            color: #64748B;
+            transition: all 0.2s ease;
+            border: none;
+            background: transparent;
+        }
+        .role-tab.active {
+            background: white;
+            color: #3B82F6;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .select-input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #CBD5E1;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            background: white;
+            color: #1E293B;
+            outline: none;
+        }
+        .select-input:focus {
+            border-color: #3B82F6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+        .alert-box {
+            display: none;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 16px;
+        }
+        .alert-error {
+            background: #FEE2E2;
+            color: #991B1B;
+            border: 1px solid #FCA5A5;
+        }
+        .alert-success {
+            background: #DCFCE7;
+            color: #166534;
+            border: 1px solid #86EFAC;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- LEFT SIDE -->
+        <div class="left">
+            <div class="left-content">
+                <h1 class="hero-title">
+                    Join ClariQ.<br />
+                    <span class="highlight">Learn Freely.</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Dynamic academic registration for students and faculty.
+                    Your identity remains protected during doubt discussions.
+                </p>
+                <div class="illustration-container">
+                    <img src="../assets/images/login-illustration.png" alt="Illustration" class="hero-img" />
+                    <div class="features-row">
+                        <div class="feature-item">
+                            <div class="feature-icon-circle"><i data-lucide="shield-check"></i></div>
+                            <span class="feature-text">Anonymous<br>Doubts</span>
+                        </div>
+                        <div class="feature-divider"></div>
+                        <div class="feature-item">
+                            <div class="feature-icon-circle"><i data-lucide="sparkles"></i></div>
+                            <span class="feature-text">AI Semantic<br>Summaries</span>
+                        </div>
+                        <div class="feature-divider"></div>
+                        <div class="feature-item">
+                            <div class="feature-icon-circle"><i data-lucide="check-circle-2"></i></div>
+                            <span class="feature-text">Teacher-Verified<br>Answers</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT SIDE: REGISTRATION FORM -->
+        <div class="right">
+            <div class="login-box" style="max-width: 480px; padding: 32px 36px;">
+                <div class="card-header" style="margin-bottom: 20px;">
+                    <img src="../assets/images/clariq-logo.svg" alt="ClariQ Logo" class="logo" />
+                    <h2>Create an Account</h2>
+                    <p class="login-subtitle">Choose your academic role to register</p>
+                </div>
+
+                <!-- ROLE SELECTOR TABS -->
+                <div class="role-tabs">
+                    <button type="button" class="role-tab active" id="tabStudent" onclick="selectRole('student')">
+                        🎓 Student
+                    </button>
+                    <button type="button" class="role-tab" id="tabTeacher" onclick="selectRole('teacher')">
+                        👨‍🏫 Teacher
+                    </button>
+                </div>
+
+                <!-- NOTIFICATION ALERT -->
+                <div id="alertBox" class="alert-box"></div>
+
+                <!-- STUDENT REGISTRATION FORM -->
+                <form id="studentForm" onsubmit="handleStudentRegister(event)">
+                    <div class="form-group">
+                        <label for="sFullName"><i data-lucide="user" class="input-icon"></i> Full Name</label>
+                        <input type="text" id="sFullName" placeholder="e.g. Aarav Sharma" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sEmail"><i data-lucide="mail" class="input-icon"></i> Email Address</label>
+                        <input type="email" id="sEmail" placeholder="student@college.edu" required />
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="sPassword"><i data-lucide="lock" class="input-icon"></i> Password</label>
+                            <input type="password" id="sPassword" placeholder="Min. 6 chars" required minlength="6" />
+                        </div>
+                        <div class="form-group">
+                            <label for="sConfirmPassword"><i data-lucide="lock" class="input-icon"></i> Confirm</label>
+                            <input type="password" id="sConfirmPassword" placeholder="Re-enter password" required minlength="6" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sDepartment"><i data-lucide="building-2" class="input-icon"></i> Department / Branch</label>
+                        <select id="sDepartment" class="select-input" required>
+                            <option value="Computer Science & Engineering">Computer Science & Engineering</option>
+                            <option value="CSE (Artificial Intelligence & ML)">CSE (Artificial Intelligence & ML)</option>
+                            <option value="Information Technology">Information Technology</option>
+                            <option value="Electronics & Communication">Electronics & Communication</option>
+                        </select>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="sSemester"><i data-lucide="calendar" class="input-icon"></i> Semester</label>
+                            <select id="sSemester" class="select-input" required>
+                                <option value="1">Semester 1 (Year 1)</option>
+                                <option value="2">Semester 2 (Year 1)</option>
+                                <option value="3" selected>Semester 3 (Year 2)</option>
+                                <option value="4">Semester 4 (Year 2)</option>
+                                <option value="5">Semester 5 (Year 3)</option>
+                                <option value="6">Semester 6 (Year 3)</option>
+                                <option value="7">Semester 7 (Year 4)</option>
+                                <option value="8">Semester 8 (Year 4)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="sSection"><i data-lucide="users" class="input-icon"></i> Section</label>
+                            <select id="sSection" class="select-input" required>
+                                <option value="AIML">AIML</option>
+                                <option value="CS1">CS1</option>
+                                <option value="A">Section A</option>
+                                <option value="B">Section B</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="btnStudentSubmit" style="margin-top: 10px;">
+                        <span>Register as Student</span>
+                        <span>&rarr;</span>
+                    </button>
+                </form>
+
+                <!-- TEACHER REGISTRATION FORM (Hidden by default) -->
+                <form id="teacherForm" onsubmit="handleTeacherRegister(event)" style="display: none;">
+                    <div class="form-group">
+                        <label for="tFullName"><i data-lucide="user-check" class="input-icon"></i> Full Name</label>
+                        <input type="text" id="tFullName" placeholder="e.g. Dr. Rajesh Kumar" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tEmail"><i data-lucide="mail" class="input-icon"></i> Official Faculty Email</label>
+                        <input type="email" id="tEmail" placeholder="faculty@college.edu" required />
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="tPassword"><i data-lucide="lock" class="input-icon"></i> Password</label>
+                            <input type="password" id="tPassword" placeholder="Min. 6 chars" required minlength="6" />
+                        </div>
+                        <div class="form-group">
+                            <label for="tConfirmPassword"><i data-lucide="lock" class="input-icon"></i> Confirm</label>
+                            <input type="password" id="tConfirmPassword" placeholder="Re-enter password" required minlength="6" />
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="tDepartment"><i data-lucide="building-2" class="input-icon"></i> Department</label>
+                            <select id="tDepartment" class="select-input" required>
+                                <option value="Computer Science & Engineering">Computer Science & Engineering</option>
+                                <option value="Information Technology">Information Technology</option>
+                                <option value="Electronics & Communication">Electronics & Communication</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="tDesignation"><i data-lucide="award" class="input-icon"></i> Designation</label>
+                            <select id="tDesignation" class="select-input" required>
+                                <option value="Assistant Professor">Assistant Professor</option>
+                                <option value="Associate Professor">Associate Professor</option>
+                                <option value="Professor">Professor</option>
+                                <option value="Head of Department">Head of Department</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tProfile"><i data-lucide="file-text" class="input-icon"></i> Profile / Specialization (Optional)</label>
+                        <input type="text" id="tProfile" placeholder="e.g. Data Structures, Machine Learning, DBMS" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tInviteCode"><i data-lucide="shield-check" class="input-icon"></i> Faculty Verification Key <span style="color: #DC2626;">*</span></label>
+                        <input type="text" id="tInviteCode" placeholder="Enter institutional faculty key" required />
+                        <span style="font-size: 11px; color: #64748B; margin-top: 4px; display: block;">Requires institutional key issued by academic administrator.</span>
+                    </div>
+
+                    <button type="submit" id="btnTeacherSubmit" style="margin-top: 10px;">
+                        <span>Register as Faculty</span>
+                        <span>&rarr;</span>
+                    </button>
+                </form>
+
+                <div style="margin-top: 20px; text-align: center; font-size: 14px; color: #64748B;">
+                    Already have an account? 
+                    <a href="login.html" style="color: #3B82F6; font-weight: 600; text-decoration: none;">Log In</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = "http://127.0.0.1:8000";
+        let currentRole = "student";
+
+        function selectRole(role) {
+            currentRole = role;
+            const tabStudent = document.getElementById("tabStudent");
+            const tabTeacher = document.getElementById("tabTeacher");
+            const studentForm = document.getElementById("studentForm");
+            const teacherForm = document.getElementById("teacherForm");
+
+            if (role === "student") {
+                tabStudent.classList.add("active");
+                tabTeacher.classList.remove("active");
+                studentForm.style.display = "block";
+                teacherForm.style.display = "none";
+            } else {
+                tabTeacher.classList.add("active");
+                tabStudent.classList.remove("active");
+                studentForm.style.display = "none";
+                teacherForm.style.display = "block";
+            }
+            hideAlert();
+        }
+
+        function showAlert(message, isError = true) {
+            const box = document.getElementById("alertBox");
+            box.textContent = message;
+            box.className = "alert-box " + (isError ? "alert-error" : "alert-success");
+            box.style.display = "block";
+        }
+
+        function hideAlert() {
+            document.getElementById("alertBox").style.display = "none";
+        }
+
+        async function handleStudentRegister(e) {
+            e.preventDefault();
+            hideAlert();
+
+            const p1 = document.getElementById("sPassword").value;
+            const p2 = document.getElementById("sConfirmPassword").value;
+            if (p1 !== p2) {
+                showAlert("Passwords do not match!");
+                return;
+            }
+
+            const btn = document.getElementById("btnStudentSubmit");
+            btn.disabled = true;
+            btn.textContent = "Registering...";
+
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/auth/student/register`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        full_name: document.getElementById("sFullName").value.trim(),
+                        email: document.getElementById("sEmail").value.trim(),
+                        password: p1,
+                        confirm_password: p2,
+                        department: document.getElementById("sDepartment").value,
+                        semester_number: parseInt(document.getElementById("sSemester").value),
+                        section_code: document.getElementById("sSection").value
+                    })
+                });
+
+                const data = await res.json();
+                if (!res.ok) {
+                    throw new Error(data.detail || "Registration failed.");
+                }
+
+                showAlert(`Registration successful! Generated College ID: ${data.college_id}. Redirecting...`, false);
+                sessionStorage.setItem("clariqToken", data.access_token);
+                localStorage.setItem("clariqToken", data.access_token);
+                localStorage.setItem("clariqStudentId", data.college_id);
+                localStorage.setItem("clariqUser", JSON.stringify({
+                    id: data.user_id,
+                    collegeId: data.college_id,
+                    name: data.name,
+                    role: "STUDENT",
+                    department: data.department,
+                    email: data.email
+                }));
+
+                setTimeout(() => {
+                    window.location.href = "dashboard.html";
+                }, 1500);
+
+            } catch (err) {
+                showAlert(err.message);
+                btn.disabled = false;
+                btn.innerHTML = "<span>Register as Student</span> <span>&rarr;</span>";
+            }
+        }
+
+        async function handleTeacherRegister(e) {
+            e.preventDefault();
+            hideAlert();
+
+            const p1 = document.getElementById("tPassword").value;
+            const p2 = document.getElementById("tConfirmPassword").value;
+            if (p1 !== p2) {
+                showAlert("Passwords do not match!");
+                return;
+            }
+
+            const btn = document.getElementById("btnTeacherSubmit");
+            btn.disabled = true;
+            btn.textContent = "Registering...";
+
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/auth/teacher/register`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        full_name: document.getElementById("tFullName").value.trim(),
+                        email: document.getElementById("tEmail").value.trim(),
+                        password: p1,
+                        confirm_password: p2,
+                        department: document.getElementById("tDepartment").value,
+                        designation: document.getElementById("tDesignation").value,
+                        faculty_invite_code: document.getElementById("tInviteCode").value.trim(),
+                        profile_info: document.getElementById("tProfile").value.trim()
+                    })
+                });
+
+                const data = await res.json();
+                if (!res.ok) {
+                    throw new Error(data.detail || "Registration failed.");
+                }
+
+                showAlert(`Faculty account created! Generated ID: ${data.college_id}. Redirecting...`, false);
+                sessionStorage.setItem("clariqToken", data.access_token);
+                localStorage.setItem("clariqToken", data.access_token);
+                localStorage.setItem("clariqTeacherId", data.college_id);
+                localStorage.setItem("clariqUser", JSON.stringify({
+                    id: data.user_id,
+                    collegeId: data.college_id,
+                    name: data.name,
+                    role: "TEACHER",
+                    department: data.department,
+                    email: data.email
+                }));
+
+                setTimeout(() => {
+                    window.location.href = "../teacher-pages/dashboard.html";
+                }, 1500);
+
+            } catch (err) {
+                showAlert(err.message);
+                btn.disabled = false;
+                btn.innerHTML = "<span>Register as Faculty</span> <span>&rarr;</span>";
+            }
+        }
+
+        lucide.createIcons();
+    </script>
+</body>
+</html>

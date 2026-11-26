@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Console | ClariQ</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --primary: #405CFF;
+            --primary-hover: #334AC7;
+            --primary-light: #EEF2FF;
+            --sidebar-bg: #FFFFFF;
+            --sidebar-text: #475569;
+            --sidebar-icons: #64748B;
+            --sidebar-active: #405CFF;
+            --sidebar-active-bg: #EEF2FF;
+            --sidebar-border: #E2E8F0;
+            --sidebar-hover-bg: #F1F5F9;
+            --bg: #F5F7FB;
+            --card-bg: #FFFFFF;
+            --border: #E2E8F0;
+            --text: #0F172A;
+            --text-muted: #64748B;
+            --success: #059669;
+            --success-bg: #DCFCE7;
+            --warning: #D97706;
+            --warning-bg: #FEF3C7;
+            --danger: #DC2626;
+            --danger-bg: #FEE2E2;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
+            --radius: 12px;
+            --radius-lg: 16px;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            min-height: 100vh;
+            font-size: 14px;
+        }
+
+        /* =========== SIDEBAR =========== */
+        .sidebar {
+            width: 260px;
+            min-width: 260px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--sidebar-border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0; left: 0; bottom: 0;
+            z-index: 100;
+            padding: 20px 14px 16px;
+            overflow-y: auto;
+            box-shadow: 1px 0 3px rgba(0,0,0,0.02);
+            transition: transform 0.25s ease-in-out;
+        }
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 8px 18px;
+            border-bottom: 1px solid var(--sidebar-border);
+            margin-bottom: 16px;
+        }
+        .sidebar-brand img { height: 32px; width: auto; }
+        .sidebar-brand-text h2 { font-size: 16px; font-weight: 700; color: #0F172A; }
+        .sidebar-brand-text span { font-size: 11px; color: #64748B; letter-spacing: 0.6px; text-transform: uppercase; font-weight: 600; }
+        .sidebar-label {
+            font-size: 11px; font-weight: 700; color: #64748B;
+            text-transform: uppercase; letter-spacing: 0.8px;
+            padding: 0 10px 8px; margin-top: 8px;
+        }
+        .nav-list { list-style: none; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+        .nav-item a {
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 14px; border-radius: 10px;
+            color: var(--sidebar-text); text-decoration: none;
+            font-size: 13px; font-weight: 500;
+            transition: all 0.15s ease; cursor: pointer;
+        }
+        .nav-item a i { width: 18px; height: 18px; flex-shrink: 0; color: var(--sidebar-icons); transition: color 0.15s; }
+        .nav-item a:hover { background: var(--sidebar-hover-bg); color: #0F172A; }
+        .nav-item a:hover i { color: #0F172A; }
+        .nav-item a.active {
+            background: var(--sidebar-active-bg);
+            color: var(--sidebar-active);
+            font-weight: 600;
+        }
+        .nav-item a.active i { color: var(--sidebar-active); }
+        .sidebar-footer { padding-top: 14px; border-top: 1px solid var(--sidebar-border); margin-top: auto; }
+        .btn-logout {
+            display: flex; align-items: center; gap: 10px; width: 100%;
+            padding: 10px 14px; border-radius: 10px; cursor: pointer;
+            background: rgba(239,68,68,0.06); color: #DC2626;
+            border: 1px solid rgba(239,68,68,0.18); font-size: 13px; font-weight: 600;
+            transition: background 0.15s;
+        }
+        .btn-logout:hover { background: rgba(239,68,68,0.12); }
+        .btn-logout i { width: 16px; height: 16px; }
+
+        /* =========== MAIN =========== */
+        .main { margin-left: 260px; flex: 1; padding: 28px 32px; min-height: 100vh; background: var(--bg); }
+
+        /* =========== TOP BAR =========== */
+        .topbar {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 24px;
+        }
+        .topbar-left h1 { font-size: 22px; font-weight: 700; color: var(--text); }
+        .topbar-left p { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+        .topbar-right { display: flex; align-items: center; gap: 10px; }
+        .admin-badge {
+            background: var(--primary-light); color: var(--primary);
+            padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 700;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .admin-badge i { width: 14px; height: 14px; }
+
+        /* =========== STAT CARDS =========== */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 14px; margin-bottom: 24px;
+        }
+        .stat-card {
+            background: var(--card-bg); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); padding: 18px 20px;
+            box-shadow: var(--shadow-sm);
+        }
+        .stat-card .sc-label {
+            font-size: 11px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 8px;
+        }
+        .stat-card .sc-value {
+            font-size: 28px; font-weight: 800; color: var(--text); line-height: 1;
+        }
+        .stat-card .sc-sub { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+        .stat-card.stat-primary .sc-value { color: var(--primary); }
+        .stat-card.stat-success .sc-value { color: var(--success); }
+        .stat-card.stat-warning .sc-value { color: var(--warning); }
+
+        /* =========== SECTION PANELS =========== */
+        .panel { display: none; }
+        .panel.active { display: block; }
+
+        .panel-card {
+            background: var(--card-bg); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);
+            overflow: hidden; margin-bottom: 20px;
+        }
+        .panel-card-header {
+            padding: 18px 24px; border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 10px;
+        }
+        .panel-card-header h2 { font-size: 16px; font-weight: 700; }
+        .panel-card-header p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+        .panel-card-body { padding: 20px 24px; }
+
+        /* =========== VIEW TOGGLE =========== */
+        .view-toggle {
+            display: flex; gap: 4px; background: #F1F5F9;
+            padding: 4px; border-radius: 10px;
+        }
+        .view-toggle button {
+            padding: 6px 14px; border-radius: 8px; border: none;
+            font-size: 12px; font-weight: 600; cursor: pointer;
+            background: transparent; color: var(--text-muted); transition: all 0.15s;
+        }
+        .view-toggle button.active {
+            background: white; color: var(--primary);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+
+        /* =========== SEARCH / FILTER BAR =========== */
+        .filter-bar {
+            display: flex; align-items: center; gap: 10px;
+            flex-wrap: wrap; padding: 14px 24px;
+            border-bottom: 1px solid var(--border);
+            background: #FAFAFA;
+        }
+        .search-input {
+            flex: 1; min-width: 200px; max-width: 320px;
+            padding: 8px 12px 8px 36px;
+            border: 1px solid var(--border); border-radius: 8px;
+            font-size: 13px; outline: none; background: white;
+            position: relative;
+        }
+        .search-wrap { position: relative; }
+        .search-wrap i {
+            position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+            color: #94A3B8; width: 14px; height: 14px;
+        }
+        .filter-select {
+            padding: 8px 12px; border: 1px solid var(--border);
+            border-radius: 8px; font-size: 13px; background: white;
+            color: var(--text); outline: none; cursor: pointer;
+        }
+
+        /* =========== TABLE =========== */
+        .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .data-table th {
+            background: #F8FAFC; color: #475569; font-weight: 700;
+            font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+            padding: 11px 16px; text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        .data-table td {
+            padding: 14px 16px; border-bottom: 1px solid #F1F5F9; vertical-align: middle;
+        }
+        .data-table tr:last-child td { border-bottom: none; }
+        .data-table tr:hover td { background: #FAFAFA; }
+
+        /* =========== BADGES =========== */
+        .badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 3px 8px; border-radius: 6px;
+            font-size: 11px; font-weight: 700;
+        }
+        .badge-green { background: var(--success-bg); color: var(--success); }
+        .badge-red { background: var(--danger-bg); color: var(--danger); }
+        .badge-blue { background: var(--primary-light); color: var(--primary); border: 1px solid #C7D2FE; }
+        .badge-gray { background: #F1F5F9; color: #475569; }
+        .badge-amber { background: var(--warning-bg); color: var(--warning); }
+        .badge-purple { background: #EDE9FE; color: #6D28D9; border: 1px solid #DDD6FE; }
+        .badge-primary-sub { background: #EEF2FF; color: #405CFF; border: 1px solid #C7D2FE; font-weight: 600; }
+        .badge-addl-sub { background: #F1F5F9; color: #334155; border: 1px solid #CBD5E1; font-weight: 500; }
+        .subject-badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 6px; font-size: 11px; margin: 2px; }
+
+        /* =========== BUTTONS =========== */
+        .btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 8px 16px; border-radius: 8px; border: none;
+            font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s;
+        }
+        .btn i { width: 14px; height: 14px; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-secondary { background: white; color: var(--text); border: 1px solid var(--border); }
+        .btn-secondary:hover { background: #F8FAFC; }
+        .btn-success { background: var(--success-bg); color: var(--success); }
+        .btn-danger { background: var(--danger-bg); color: var(--danger); }
+        .btn-sm { padding: 5px 10px; font-size: 12px; }
+        .btn-xs { padding: 3px 8px; font-size: 11px; border-radius: 6px; }
+
+        /* =========== SUBJECT CARDS GRID =========== */
+        .subjects-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 16px; padding: 20px 24px;
+        }
+        .subject-card {
+            background: white; border: 1px solid var(--border); border-radius: 14px;
+            padding: 20px; box-shadow: var(--shadow-sm);
+            display: flex; flex-direction: column; gap: 12px;
+            transition: box-shadow 0.15s;
+        }
+        .subject-card:hover { box-shadow: var(--shadow-md); }
+        .subject-card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+        .subject-card-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+        .subject-card-name { font-size: 15px; font-weight: 700; color: var(--text); line-height: 1.3; }
+        .faculty-chip {
+            display: flex; align-items: center; justify-content: space-between;
+            background: #F8FAFC; border: 1px solid #E2E8F0;
+            border-radius: 8px; padding: 7px 10px; font-size: 12px;
+        }
+        .faculty-chip.primary-chip { background: var(--primary-light); border-color: #C7D2FE; }
+        .faculty-chip-name { font-weight: 600; color: var(--text); }
+        .faculty-chip-dept { font-size: 11px; color: var(--text-muted); }
+        .subject-actions { display: flex; gap: 6px; padding-top: 10px; border-top: 1px solid #F1F5F9; }
+        .subject-actions .btn { flex: 1; justify-content: center; }
+
+        /* =========== FACULTY OVERVIEW TABLE =========== */
+        .faculty-subjects-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+        .faculty-subject-chip {
+            padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600;
+            background: var(--primary-light); color: var(--primary);
+        }
+        .faculty-subject-chip.chip-additional { background: #F1F5F9; color: #475569; }
+
+        /* =========== MODAL =========== */
+        .modal-overlay {
+            display: none; position: fixed;
+            inset: 0; background: rgba(15,23,42,0.6);
+            backdrop-filter: blur(4px); z-index: 999;
+            align-items: center; justify-content: center;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-box {
+            background: white; border-radius: 20px;
+            width: 90%; max-width: 640px; max-height: 90vh;
+            overflow-y: auto; padding: 28px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+        }
+        .modal-box.modal-lg { max-width: 760px; }
+        .modal-header {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border);
+        }
+        .modal-header h3 { font-size: 18px; font-weight: 700; }
+        .modal-header p { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+        .modal-close-btn {
+            background: none; border: none; cursor: pointer;
+            color: var(--text-muted); padding: 4px; border-radius: 6px;
+        }
+        .modal-close-btn:hover { background: #F1F5F9; }
+        .modal-close-btn i { width: 18px; height: 18px; }
+        .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); }
+
+        /* =========== FORM STYLES =========== */
+        .form-group { margin-bottom: 16px; }
+        .form-label { display: block; font-size: 12px; font-weight: 700; color: #475569; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.4px; }
+        .form-control {
+            width: 100%; padding: 9px 12px;
+            border: 1px solid var(--border); border-radius: 8px;
+            font-size: 13px; outline: none; transition: border-color 0.15s;
+            background: white; color: var(--text);
+        }
+        .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .form-hint { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+        .section-divider { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin: 16px 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+
+        /* =========== MULTI SELECT =========== */
+        .multi-select-list {
+            border: 1px solid var(--border); border-radius: 8px;
+            max-height: 180px; overflow-y: auto; background: white;
+        }
+        .multi-select-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 12px; cursor: pointer; transition: background 0.1s;
+        }
+        .multi-select-item:hover { background: var(--primary-light); }
+        .multi-select-item input[type="checkbox"] { width: 14px; height: 14px; accent-color: var(--primary); cursor: pointer; }
+        .multi-select-item label { flex: 1; cursor: pointer; font-size: 13px; }
+        .multi-select-item .badge { flex-shrink: 0; }
+
+        /* =========== ASSIGNED FACULTY LIST IN MODAL =========== */
+        .assigned-list { display: flex; flex-direction: column; gap: 8px; }
+        .assigned-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 10px 14px; border: 1px solid var(--border);
+            border-radius: 10px; background: white;
+        }
+        .assigned-item.primary-item { border-color: #C7D2FE; background: var(--primary-light); }
+        .assigned-item-info { flex: 1; }
+        .assigned-item-name { font-weight: 600; font-size: 13px; }
+        .assigned-item-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+        .assigned-item-actions { display: flex; gap: 6px; }
+
+        /* =========== OVERVIEW WIDGETS =========== */
+        .overview-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .ov-widget { background: white; border: 1px solid var(--border); border-radius: 14px; padding: 20px; }
+        .ov-widget h4 { font-size: 13px; font-weight: 700; margin-bottom: 12px; }
+        .recent-doubt-row { display: flex; gap: 10px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid #F1F5F9; }
+        .recent-doubt-row:last-child { border-bottom: none; }
+        .rd-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
+        .rd-dot.pending { background: var(--warning); }
+        .rd-dot.resolved { background: var(--success); }
+        .rd-title { font-size: 12px; font-weight: 600; color: var(--text); }
+        .rd-meta { font-size: 11px; color: var(--text-muted); }
+
+        /* =========== PAGINATION =========== */
+        .pagination { display: flex; align-items: center; justify-content: flex-end; gap: 6px; padding: 14px 24px; border-top: 1px solid var(--border); }
+        .page-btn {
+            width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border);
+            background: white; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 600; color: var(--text-muted); transition: all 0.15s;
+        }
+        .page-btn:hover, .page-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .page-info { font-size: 12px; color: var(--text-muted); padding: 0 8px; }
+
+        /* =========== TOAST =========== */
+        #toastContainer {
+            position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+            display: flex; flex-direction: column; gap: 8px;
+        }
+        .toast {
+            padding: 12px 18px; border-radius: 10px; min-width: 260px; max-width: 380px;
+            font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 10px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12); animation: slideIn 0.25s ease;
+        }
+        .toast i { width: 16px; height: 16px; flex-shrink: 0; }
+        .toast-success { background: #DCFCE7; color: #166534; border: 1px solid #BBF7D0; }
+        .toast-error { background: #FEE2E2; color: #991B1B; border: 1px solid #FECACA; }
+        .toast-info { background: var(--primary-light); color: var(--primary); border: 1px solid #C7D2FE; }
+        @keyframes slideIn { from { opacity:0; transform: translateX(20px); } to { opacity:1; transform: translateX(0); } }
+
+        /* =========== EMPTY STATE =========== */
+        .empty-state {
+            text-align: center; padding: 48px 20px; color: var(--text-muted);
+        }
+        .empty-state i { width: 48px; height: 48px; margin: 0 auto 12px; display: block; opacity: 0.4; }
+        .empty-state h4 { font-size: 15px; font-weight: 600; margin-bottom: 4px; color: #475569; }
+        .empty-state p { font-size: 13px; }
+
+        /* =========== RESPONSIVE =========== */
+        @media (max-width: 1024px) {
+            .sidebar { width: 240px; min-width: 240px; }
+            .main { margin-left: 240px; padding: 20px; }
+            .form-row { grid-template-columns: 1fr; }
+            .overview-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+            }
+            .sidebar.mobile-open {
+                transform: translateX(0);
+                display: flex;
+            }
+            .main { margin-left: 0; padding: 16px; }
+            .subjects-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ============================================================
+     SIDEBAR
+     ============================================================ -->
+<aside class="sidebar" id="adminSidebar">
+    <div class="sidebar-brand">
+        <img src="../assets/images/clariq-logo.svg" alt="ClariQ">
+        <div class="sidebar-brand-text">
+            <h2>ClariQ</h2>
+            <span>Admin Console</span>
+        </div>
+    </div>
+
+    <div class="sidebar-label">Management</div>
+    <ul class="nav-list">
+        <li class="nav-item">
+            <a href="#overview" onclick="switchTab('overview'); return false;" id="nav-overview">
+                <i data-lucide="layout-dashboard"></i>
+                <span>Overview</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="#faculty" onclick="switchTab('faculty'); return false;" id="nav-faculty">
+                <i data-lucide="users"></i>
+                <span>Faculty Management</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="#subjects" onclick="switchTab('subjects'); return false;" id="nav-subjects">
+                <i data-lucide="book-marked"></i>
+                <span>Subjects &amp; Faculty</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="#students" onclick="switchTab('students'); return false;" id="nav-students">
+                <i data-lucide="graduation-cap"></i>
+                <span>Student Academic</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="#routing" onclick="switchTab('routing'); return false;" id="nav-routing">
+                <i data-lucide="arrow-right-left"></i>
+                <span>Doubt Routing</span>
+            </a>
+        </li>
+    </ul>
+
+    <div class="sidebar-footer">
+        <div style="padding: 8px 12px 10px; font-size: 12px; color: #475569;">
+            <span id="sidebarAdminName">Administrator</span>
+        </div>
+        <button class="btn-logout" onclick="handleLogout()">
+            <i data-lucide="log-out"></i>
+            <span>Sign Out</span>
+        </button>
+    </div>
+</aside>
+
+<!-- ============================================================
+     MAIN CONTENT
+     ============================================================ -->
+<main class="main">
+    <!-- TOP BAR -->
+    <div class="topbar">
+        <div class="topbar-left">
+            <h1 id="pageTitle">Institutional Console</h1>
+            <p id="pageSubtitle">Administrative control for ClariQ platform</p>
+        </div>
+        <div class="topbar-right">
+            <div class="admin-badge">
+                <i data-lucide="shield-check"></i>
+                <span id="adminBadgeEmail">Super Admin</span>
+            </div>
+            <button class="btn btn-secondary btn-sm" onclick="refreshCurrentTab()">
+                <i data-lucide="refresh-cw"></i>
+                Refresh
+            </button>
+        </div>
+    </div>
+
+    <!-- STATS ROW (always visible) -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="sc-label">Total Students</div>
+            <div class="sc-value" id="statStudents">—</div>
+            <div class="sc-sub">Registered accounts</div>
+        </div>
+        <div class="stat-card stat-primary">
+            <div class="sc-label">Total Faculty</div>
+            <div class="sc-value" id="statFaculty">—</div>
+            <div class="sc-sub">Teaching staff</div>
+        </div>
+        <div class="stat-card">
+            <div class="sc-label">Curriculum Subjects</div>
+            <div class="sc-value" id="statSubjects">—</div>
+            <div class="sc-sub">Active subjects</div>
+        </div>
+        <div class="stat-card stat-primary">
+            <div class="sc-label">Faculty Assignments</div>
+            <div class="sc-value" id="statAssignments">—</div>
+            <div class="sc-sub">Active assignments</div>
+        </div>
+        <div class="stat-card">
+            <div class="sc-label">Total Doubts</div>
+            <div class="sc-value" id="statDoubts">—</div>
+            <div class="sc-sub">All time</div>
+        </div>
+        <div class="stat-card stat-warning">
+            <div class="sc-label">Pending</div>
+            <div class="sc-value" id="statPending">—</div>
+            <div class="sc-sub">Awaiting answer</div>
+        </div>
+        <div class="stat-card stat-success">
+            <div class="sc-label">Resolved</div>
+            <div class="sc-value" id="statResolved">—</div>
+            <div class="sc-sub">Verified answers</div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         PANEL: OVERVIEW
+         ============================================================ -->
+    <div class="panel active" id="panel-overview">
+        <div class="overview-grid">
+            <div class="ov-widget">
+                <h4>Recent Doubt Activity</h4>
+                <div id="recentDoubtsList">
+                    <div class="empty-state" style="padding:20px 0;">
+                        <p>Loading activity...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="ov-widget">
+                <h4>Quick Actions</h4>
+                <div style="display:flex; flex-direction:column; gap:10px; margin-top:4px;">
+                    <button class="btn btn-primary" style="justify-content:flex-start;" onclick="switchTab('subjects'); setTimeout(openAddSubjectModal, 300)">
+                        <i data-lucide="plus-circle"></i> Add New Subject
+                    </button>
+                    <button class="btn btn-secondary" style="justify-content:flex-start;" onclick="switchTab('faculty')">
+                        <i data-lucide="users"></i> Manage Faculty
+                    </button>
+                    <button class="btn btn-secondary" style="justify-content:flex-start;" onclick="switchTab('subjects')">
+                        <i data-lucide="book-marked"></i> Subjects &amp; Faculty
+                    </button>
+                    <button class="btn btn-secondary" style="justify-content:flex-start;" onclick="switchTab('routing')">
+                        <i data-lucide="arrow-right-left"></i> Doubt Routing
+                    </button>
+                </div>
+                <div style="margin-top:16px; padding:14px; background:#F8FAFC; border-radius:10px; font-size:12px; color:#64748B; line-height:1.6;">
+                    <strong style="display:block; color:#475569; margin-bottom:4px;">Welcome to ClariQ Admin</strong>
+                    Use the sidebar to manage faculty, subjects, and doubt routing. All changes reflect instantly in student and teacher dashboards.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         PANEL: FACULTY MANAGEMENT
+         ============================================================ -->
+    <div class="panel" id="panel-faculty">
+        <!-- View Toggle -->
+        <div class="panel-card">
+            <div class="panel-card-header">
+                <div>
+                    <h2>Faculty Directory</h2>
+                    <p>Manage teacher accounts and view subject assignments</p>
+                </div>
+                <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                    <div class="view-toggle">
+                        <button class="active" id="btnFaculty-list" onclick="setFacultyView('list')">
+                            Directory
+                        </button>
+                        <button id="btnFaculty-overview" onclick="setFacultyView('overview')">
+                            Teaching Overview
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="filter-bar">
+                <div class="search-wrap">
+                    <i data-lucide="search"></i>
+                    <input type="text" class="search-input" id="facultySearch"
+                        placeholder="Search by name, ID, or email..." oninput="filterFaculty()">
+                </div>
+                <select class="filter-select" id="facultyDeptFilter" onchange="filterFaculty()">
+                    <option value="">All Departments</option>
+                    <option>Computer Science &amp; Engineering</option>
+                    <option>Information Technology</option>
+                    <option>Electronics &amp; Communication</option>
+                    <option>Mathematics</option>
+                </select>
+                <select class="filter-select" id="facultyStatusFilter" onchange="filterFaculty()">
+                    <option value="">All Status</option>
+                    <option value="true">Active</option>
+                    <option value="false">Inactive</option>
+                </select>
+            </div>
+
+            <!-- Faculty Directory Table -->
+            <div id="facultyDirectoryView">
+                <div style="overflow-x:auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Faculty ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Department</th>
+                                <th>Designation</th>
+                                <th>Subjects</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="facultyTableBody">
+                            <tr><td colspan="8"><div class="empty-state"><p>Loading faculty...</p></div></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Faculty Overview Table -->
+            <div id="facultyOverviewView" style="display:none;">
+                <div style="overflow-x:auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Faculty</th>
+                                <th>Department</th>
+                                <th>Designation</th>
+                                <th>Primary Subjects</th>
+                                <th>Additional Subjects</th>
+                                <th>Total</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="facultyOverviewBody">
+                            <tr><td colspan="7"><div class="empty-state"><p>Loading...</p></div></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         PANEL: SUBJECTS & FACULTY
+         ============================================================ -->
+    <div class="panel" id="panel-subjects">
+        <div class="panel-card">
+            <div class="panel-card-header">
+                <div>
+                    <h2>Subjects &amp; Faculty Management</h2>
+                    <p>Manage curriculum, faculty assignments and academic responsibilities</p>
+                </div>
+                <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+                    <div class="view-toggle">
+                        <button class="active" id="btnSubj-cards" onclick="setSubjectsView('cards')">Cards</button>
+                        <button id="btnSubj-table" onclick="setSubjectsView('table')">Table</button>
+                    </div>
+                    <button class="btn btn-primary" onclick="openAddSubjectModal()">
+                        <i data-lucide="plus"></i> Add New Subject
+                    </button>
+                </div>
+            </div>
+
+            <!-- Summary mini-cards -->
+            <div style="display:grid; grid-template-columns: repeat(auto-fit,minmax(120px,1fr)); gap:10px; padding:14px 24px; background:#F8FAFC; border-bottom:1px solid var(--border);">
+                <div style="background:white; border:1px solid var(--border); border-radius:10px; padding:12px 14px; text-align:center;">
+                    <div style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--text-muted);">Active Subjects</div>
+                    <div style="font-size:22px; font-weight:800;" id="subSummTotal">—</div>
+                </div>
+                <div style="background:white; border:1px solid var(--border); border-radius:10px; padding:12px 14px; text-align:center;">
+                    <div style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--text-muted);">Total Semesters</div>
+                    <div style="font-size:22px; font-weight:800; color:var(--primary);" id="subSummSemestersCount">—</div>
+                </div>
+                <div style="background:white; border:1px solid var(--border); border-radius:10px; padding:12px 14px; text-align:center;">
+                    <div style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--text-muted);">Faculty Assigned</div>
+                    <div style="font-size:22px; font-weight:800; color:var(--success);" id="subSummAssigned">—</div>
+                </div>
+                <div style="background:white; border:1px solid var(--border); border-radius:10px; padding:12px 14px; text-align:center;">
+                    <div style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--text-muted);">Faculty Unassigned</div>
+                    <div style="font-size:22px; font-weight:800; color:var(--warning);" id="subSummUnassigned">—</div>
+                </div>
+                <div style="background:white; border:1px solid var(--border); border-radius:10px; padding:12px 14px; text-align:center;">
+                    <div style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--text-muted);">Sem Unassigned</div>
+                    <div style="font-size:22px; font-weight:800; color:#DC2626;" id="subSummUnassignedSem">0</div>
+                </div>
+            </div>
+
+            <!-- Semester Breakdown Badges Banner -->
+            <div id="semesterBreakdownBar" style="padding: 10px 24px; background: white; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 12px;">
+                <span style="font-weight: 700; color: var(--text-muted); text-transform: uppercase; font-size: 11px; margin-right: 4px;">Semester Distribution:</span>
+                <span id="semesterBreakdownChips" style="display: flex; gap: 6px; flex-wrap: wrap;">Loading...</span>
+            </div>
+
+            <div class="filter-bar">
+                <div class="search-wrap">
+                    <i data-lucide="search"></i>
+                    <input type="text" class="search-input" id="subjectSearch"
+                        placeholder="Search by subject name, code or faculty..." oninput="filterSubjects()">
+                </div>
+                <select class="filter-select" id="subjectDeptFilter" onchange="filterSubjects()">
+                    <option value="">All Departments</option>
+                    <option>Computer Science &amp; Engineering</option>
+                    <option>Information Technology</option>
+                    <option>Electronics &amp; Communication</option>
+                    <option>Mathematics</option>
+                </select>
+                <select class="filter-select" id="subjectSemesterFilter" onchange="filterSubjects()">
+                    <option value="">All Semesters</option>
+                    <option value="1">Semester 1</option>
+                    <option value="2">Semester 2</option>
+                    <option value="3">Semester 3</option>
+                    <option value="4">Semester 4</option>
+                    <option value="5">Semester 5</option>
+                    <option value="6">Semester 6</option>
+                    <option value="7">Semester 7</option>
+                    <option value="8">Semester 8</option>
+                    <option value="unassigned">Unassigned</option>
+                </select>
+                <select class="filter-select" id="subjectAssignFilter" onchange="filterSubjects()">
+                    <option value="">All Faculty Assignments</option>
+                    <option value="assigned">Assigned</option>
+                    <option value="unassigned">Unassigned</option>
+                </select>
+            </div>
+
+            <!-- CARDS VIEW -->
+            <div id="subjectsCardsView">
+                <div class="subjects-grid" id="subjectsGrid">
+                    <div style="grid-column:1/-1;" class="empty-state">
+                        <p>Loading subjects...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TABLE VIEW -->
+            <div id="subjectsTableView" style="display:none; overflow-x:auto;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Subject Name</th>
+                            <th>Department</th>
+                            <th>Sem / Year</th>
+                            <th>Primary Faculty</th>
+                            <th>Additional Faculty</th>
+                            <th>Total Faculty</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="subjectsTableBody">
+                        <tr><td colspan="9"><div class="empty-state"><p>Loading subjects...</p></div></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         PANEL: STUDENT ACADEMIC MANAGEMENT
+         ============================================================ -->
+    <div class="panel" id="panel-students">
+        <div class="panel-card">
+            <div class="panel-card-header">
+                <div>
+                    <h2>Student Academic Management</h2>
+                    <p>Assign and manage student academic semesters and subject visibility</p>
+                </div>
+                <div style="display:flex; gap:8px; align-items:center;">
+                    <button class="btn btn-secondary btn-sm" onclick="loadAdminStudents()">
+                        <i data-lucide="refresh-cw"></i> Refresh
+                    </button>
+                </div>
+            </div>
+
+            <!-- Student Semester Summary mini-cards -->
+            <div style="display:grid; grid-template-columns: repeat(auto-fit,minmax(140px,1fr)); gap:10px; padding:14px 24px; background:#F8FAFC; border-bottom:1px solid var(--border);">
+                <div style="background:white; border:1px solid var(--border); border-radius:10px; padding:12px 14px; text-align:center;">
+                    <div style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--text-muted);">Total Students</div>
+                    <div style="font-size:22px; font-weight:800;" id="stuSummTotal">—</div>
+                </div>
+                <div style="background:white; border:1px solid var(--border); border-radius:10px; padding:12px 14px; text-align:center;">
+                    <div style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--text-muted);">Assigned Semester</div>
+                    <div style="font-size:22px; font-weight:800; color:var(--success);" id="stuSummAssigned">—</div>
+                </div>
+                <div style="background:white; border:1px solid var(--border); border-radius:10px; padding:12px 14px; text-align:center;">
+                    <div style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--text-muted);">Unassigned</div>
+                    <div style="font-size:22px; font-weight:800; color:var(--warning);" id="stuSummUnassigned">—</div>
+                </div>
+            </div>
+
+            <div class="filter-bar">
+                <div class="search-wrap">
+                    <i data-lucide="search"></i>
+                    <input type="text" class="search-input" id="studentSearch"
+                        placeholder="Search by student name, ID, or email..." oninput="filterStudents()">
+                </div>
+                <select class="filter-select" id="studentDeptFilter" onchange="filterStudents()">
+                    <option value="">All Departments</option>
+                    <option>Computer Science &amp; Engineering</option>
+                    <option>Information Technology</option>
+                    <option>Electronics &amp; Communication</option>
+                    <option>Mechanical Engineering</option>
+                    <option>Civil Engineering</option>
+                </select>
+                <select class="filter-select" id="studentSemFilter" onchange="filterStudents()">
+                    <option value="">All Semesters</option>
+                    <option value="1">Semester 1</option>
+                    <option value="2">Semester 2</option>
+                    <option value="3">Semester 3</option>
+                    <option value="4">Semester 4</option>
+                    <option value="5">Semester 5</option>
+                    <option value="6">Semester 6</option>
+                    <option value="7">Semester 7</option>
+                    <option value="8">Semester 8</option>
+                    <option value="unassigned">Unassigned</option>
+                </select>
+            </div>
+
+            <!-- Student Directory Table -->
+            <div style="overflow-x:auto;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Student ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Department</th>
+                            <th>Current Semester</th>
+                            <th>Section</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentsTableBody">
+                        <tr><td colspan="7"><div class="empty-state"><p>Loading students...</p></div></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         PANEL: DOUBT ROUTING
+         ============================================================ -->
+    <div class="panel" id="panel-routing">
+        <div class="panel-card">
+            <div class="panel-card-header">
+                <div>
+                    <h2>Doubt Routing &amp; Reassignment</h2>
+                    <p>Review and reassign pending doubts to appropriate faculty members</p>
+                </div>
+                <div style="display:flex; gap:8px;">
+                    <select class="filter-select" id="routingStatusFilter" onchange="loadRoutingDoubts()">
+                        <option value="pending">Pending Doubts</option>
+                        <option value="in_progress">In Progress</option>
+                        <option value="">All Doubts</option>
+                    </select>
+                </div>
+            </div>
+            <div style="overflow-x:auto;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Doubt Code</th>
+                            <th>Subject</th>
+                            <th>Title</th>
+                            <th>Current Faculty</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="routingTableBody">
+                        <tr><td colspan="7"><div class="empty-state"><p>Loading doubts...</p></div></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- ============================================================
+     TOAST CONTAINER
+     ============================================================ -->
+<div id="toastContainer"></div>
+
+<!-- ============================================================
+     MODAL: ADD / EDIT SUBJECT
+     ============================================================ -->
+<div class="modal-overlay" id="modalAddSubject">
+    <div class="modal-box modal-lg">
+        <div class="modal-header">
+            <div>
+                <h3 id="addSubjectModalTitle">Add New Subject</h3>
+                <p id="addSubjectModalSub">Create a new curriculum subject and assign faculty</p>
+            </div>
+            <button class="modal-close-btn" onclick="closeModal('modalAddSubject')">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+
+        <form id="addSubjectForm" onsubmit="handleSubjectFormSubmit(event)">
+            <input type="hidden" id="editSubjectId">
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Subject Name *</label>
+                    <input type="text" id="subjName" class="form-control" placeholder="e.g. Data Structures & Algorithms" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Subject Code *</label>
+                    <input type="text" id="subjCode" class="form-control" placeholder="e.g. BCS301" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Department</label>
+                    <select id="subjDept" class="form-control">
+                        <option value="Computer Science &amp; Engineering">Computer Science &amp; Engineering</option>
+                        <option value="Information Technology">Information Technology</option>
+                        <option value="Electronics &amp; Communication">Electronics &amp; Communication</option>
+                        <option value="Mathematics">Mathematics</option>
+                        <option value="Physics">Physics</option>
+                        <option value="Humanities">Humanities</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Subject Type</label>
+                    <select id="subjType" class="form-control">
+                        <option value="theory">Theory</option>
+                        <option value="lab">Lab / Practical</option>
+                        <option value="project">Project</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Semester Number *</label>
+                    <select id="subjSemester" class="form-control" required>
+                        <option value="">Select Semester (Mandatory)</option>
+                        <option value="1">Semester 1</option>
+                        <option value="2">Semester 2</option>
+                        <option value="3">Semester 3</option>
+                        <option value="4">Semester 4</option>
+                        <option value="5">Semester 5</option>
+                        <option value="6">Semester 6</option>
+                        <option value="7">Semester 7</option>
+                        <option value="8">Semester 8</option>
+                    </select>
+                    <div class="form-hint">Mandatory academic semester (1–8)</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Academic Year</label>
+                    <select id="subjYear" class="form-control">
+                        <option value="">Not Specified</option>
+                        <option value="First Year">First Year</option>
+                        <option value="Second Year">Second Year</option>
+                        <option value="Third Year">Third Year</option>
+                        <option value="Final Year">Final Year</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Description (Optional)</label>
+                <textarea id="subjDesc" class="form-control" rows="2" placeholder="Brief description of the subject..."></textarea>
+            </div>
+
+            <div class="section-divider">Faculty Assignment (Optional)</div>
+            <div class="form-group">
+                <label class="form-label">Primary Faculty</label>
+                <select id="subjPrimaryFaculty" class="form-control">
+                    <option value="">None — Assign later</option>
+                </select>
+                <div class="form-hint">The primary faculty is the main point of contact for student doubts in this subject.</div>
+            </div>
+            <div class="form-group" id="additionalFacultySection">
+                <label class="form-label">Additional Faculty</label>
+                <div class="multi-select-list" id="additionalFacultyList">
+                    <div style="padding:12px; color:var(--text-muted); font-size:13px;">Loading faculty...</div>
+                </div>
+                <div class="form-hint">Students will be able to route doubts to any assigned faculty member.</div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('modalAddSubject')">Cancel</button>
+                <button type="submit" class="btn btn-primary" id="subjFormSubmitBtn">
+                    <i data-lucide="plus"></i>
+                    <span id="subjFormSubmitLabel">Create Subject</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ============================================================
+     MODAL: MANAGE FACULTY ASSIGNMENT
+     ============================================================ -->
+<div class="modal-overlay" id="modalManageFaculty">
+    <div class="modal-box modal-lg">
+        <div class="modal-header">
+            <div>
+                <h3 id="mgmtModalSubjectName">Faculty Assignment</h3>
+                <p id="mgmtModalSubjectMeta">Subject Code — Department</p>
+            </div>
+            <button class="modal-close-btn" onclick="closeModal('modalManageFaculty')">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+
+        <!-- Current Assignments -->
+        <div style="margin-bottom:20px;">
+            <div style="font-size:12px; font-weight:700; text-transform:uppercase; color:var(--text-muted); margin-bottom:8px;">Currently Assigned Faculty</div>
+            <div class="assigned-list" id="mgmtAssignedList">
+                <div class="empty-state" style="padding:16px;"><p>Loading...</p></div>
+            </div>
+        </div>
+
+        <!-- Add New Faculty -->
+        <div style="background:#F8FAFC; border:1px solid var(--border); border-radius:12px; padding:16px;">
+            <div style="font-size:13px; font-weight:700; color:var(--text); margin-bottom:12px;">Assign Additional Faculty</div>
+            <form id="mgmtAssignForm" onsubmit="handleAssignFacultySubmit(event)">
+                <input type="hidden" id="mgmtSubjectId">
+                <div class="form-row">
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label class="form-label">Select Teacher</label>
+                        <select id="mgmtTeacherSelect" class="form-control" required>
+                            <option value="">Select teacher to assign...</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom:0; display:flex; flex-direction:column; justify-content:flex-end;">
+                        <label class="form-label">&nbsp;</label>
+                        <div style="display:flex; align-items:center; gap:8px; padding:9px 0;">
+                            <input type="checkbox" id="mgmtIsPrimary" style="accent-color:var(--primary); width:14px; height:14px;">
+                            <label for="mgmtIsPrimary" style="font-size:13px; cursor:pointer; font-weight:500;">Assign as Primary Faculty</label>
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-top:12px;">
+                    <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">
+                        <i data-lucide="user-plus"></i>
+                        Assign to Subject
+                    </button>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('modalManageFaculty')">Done</button>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================
+     MODAL: FACULTY PROFILE
+     ============================================================ -->
+<div class="modal-overlay" id="modalFacultyProfile">
+    <div class="modal-box">
+        <div class="modal-header">
+            <div>
+                <h3 id="fpModalName">Faculty Profile</h3>
+                <p id="fpModalCode">Teacher Code</p>
+            </div>
+            <button class="modal-close-btn" onclick="closeModal('modalFacultyProfile')">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+        <div id="fpModalBody">
+            <div class="empty-state"><p>Loading profile...</p></div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('modalFacultyProfile')">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================
+     MODAL: REASSIGN DOUBT
+     ============================================================ -->
+<div class="modal-overlay" id="modalReassignDoubt">
+    <div class="modal-box">
+        <div class="modal-header">
+            <div>
+                <h3>Reassign Doubt</h3>
+                <p id="reassignDoubtCode">Doubt Code</p>
+            </div>
+            <button class="modal-close-btn" onclick="closeModal('modalReassignDoubt')">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+        <p style="font-size:13px; color:var(--text-muted); margin-bottom:16px;">
+            Select another faculty member assigned to this subject to reassign the doubt:
+        </p>
+        <form id="reassignDoubtForm" onsubmit="handleReassignDoubt(event)">
+            <input type="hidden" id="reassignDoubtId">
+            <div class="form-group">
+                <label class="form-label">Select Faculty</label>
+                <select id="reassignFacultySelect" class="form-control" required>
+                    <option value="">Select faculty member...</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('modalReassignDoubt')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Confirm Reassignment</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ============================================================
+     MODAL: CONFIRM DELETE
+     ============================================================ -->
+<div class="modal-overlay" id="modalConfirm">
+    <div class="modal-box" style="max-width:420px;">
+        <div class="modal-header">
+            <div>
+                <h3 id="confirmTitle">Confirm Action</h3>
+                <p id="confirmSubtitle">This action cannot be undone.</p>
+            </div>
+            <button class="modal-close-btn" onclick="closeModal('modalConfirm')">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+        <p id="confirmMessage" style="font-size:13px; color:var(--text-muted); margin-bottom:20px;"></p>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('modalConfirm')">Cancel</button>
+            <button class="btn btn-danger" id="confirmActionBtn" onclick="">Confirm</button>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================
+     MODAL: EDIT SUBJECT SEMESTER
+     ============================================================ -->
+<div class="modal-overlay" id="modalEditSubjectSemester">
+    <div class="modal-box" style="max-width: 480px;">
+        <div class="modal-header">
+            <div>
+                <h3 id="editSubjSemTitle">Change Subject Semester</h3>
+                <p id="editSubjSemSubtitle">Update assigned semester for this subject</p>
+            </div>
+            <button class="modal-close-btn" onclick="closeModal('modalEditSubjectSemester')">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+        <form id="editSubjectSemesterForm" onsubmit="handleSubjectSemesterSubmit(event)">
+            <input type="hidden" id="editSubjectSemId">
+            <div style="background:#F8FAFC; border:1px solid var(--border); border-radius:10px; padding:14px; margin-bottom:16px;">
+                <div style="font-size:14px; font-weight:700; color:var(--text);" id="editSubjSemName">—</div>
+                <div style="font-size:12px; color:var(--text-muted); margin-top:2px;" id="editSubjSemMeta">—</div>
+                <div style="margin-top:8px;">
+                    <span style="font-size:11px; text-transform:uppercase; font-weight:700; color:var(--text-muted);">Current Semester:</span>
+                    <span class="badge badge-blue" id="editSubjCurrentSemBadge" style="margin-left:6px;">Semester —</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">New Semester Number *</label>
+                <select id="editSubjNewSemester" class="form-control" required>
+                    <option value="">Select New Semester...</option>
+                    <option value="1">Semester 1</option>
+                    <option value="2">Semester 2</option>
+                    <option value="3">Semester 3</option>
+                    <option value="4">Semester 4</option>
+                    <option value="5">Semester 5</option>
+                    <option value="6">Semester 6</option>
+                    <option value="7">Semester 7</option>
+                    <option value="8">Semester 8</option>
+                </select>
+                <div class="form-hint">Changing semester updates visibility for enrolled students without duplicating subjects.</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('modalEditSubjectSemester')">Cancel</button>
+                <button type="submit" class="btn btn-primary" id="btnSaveSubjectSem">Save Semester</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ============================================================
+     MODAL: ASSIGN / CHANGE STUDENT SEMESTER
+     ============================================================ -->
+<div class="modal-overlay" id="modalEditStudentSemester">
+    <div class="modal-box" style="max-width: 500px;">
+        <div class="modal-header">
+            <div>
+                <h3>Assign / Change Semester</h3>
+                <p>Update student academic semester and subject access</p>
+            </div>
+            <button class="modal-close-btn" onclick="closeModal('modalEditStudentSemester')">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+        <form id="editStudentSemesterForm" onsubmit="promptStudentSemesterConfirm(event)">
+            <input type="hidden" id="editStudentId">
+            <div style="background:#F8FAFC; border:1px solid var(--border); border-radius:10px; padding:14px; margin-bottom:16px;">
+                <div style="font-size:14px; font-weight:700; color:var(--text);" id="editStudentName">—</div>
+                <div style="font-size:12px; color:var(--text-muted); margin-top:2px;" id="editStudentMeta">—</div>
+                <div style="margin-top:8px;">
+                    <span style="font-size:11px; text-transform:uppercase; font-weight:700; color:var(--text-muted);">Current Semester:</span>
+                    <span class="badge" id="editStudentCurrentSemBadge" style="margin-left:6px;">—</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">New Semester Number *</label>
+                <select id="editStudentNewSemester" class="form-control" required>
+                    <option value="">Select Semester...</option>
+                    <option value="1">Semester 1</option>
+                    <option value="2">Semester 2</option>
+                    <option value="3">Semester 3</option>
+                    <option value="4">Semester 4</option>
+                    <option value="5">Semester 5</option>
+                    <option value="6">Semester 6</option>
+                    <option value="7">Semester 7</option>
+                    <option value="8">Semester 8</option>
+                </select>
+                <div class="form-hint">Student will immediately see subjects assigned to this semester.</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('modalEditStudentSemester')">Cancel</button>
+                <button type="submit" class="btn btn-primary" id="btnPromptStudentSem">Save Semester</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="../admin-js/dashboard.js"></script>
+</body>
+</html>

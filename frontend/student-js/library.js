@@ -1,727 +1,446 @@
-// ==========================================
-// 1. SAMPLE LIBRARY DATA
-// ==========================================
-
-const sampleLibraryDoubts = [
-
-    {
-        id: 101,
-
-        title: "Understanding Binary Search Trees",
-
-        question: "How does insertion work in a Binary Search Tree, and what happens when we insert duplicate values?",
-
-        subject: "DSA",
-
-        teacherName: "Dr. Dhaka",
-
-        status: "resolved",
-
-        publishedToLibrary: true,
-
-        isDemo: true,
-
-        tags: ["Trees", "BST", "Data Structures"],
-
-        teacherResources: [
-            {
-                name: "BST Notes.pdf",
-                size: "1.2 MB",
-                url: "#"
-            },
-            {
-                name: "Binary Trees Reference",
-                url: "https://example.com"
-            }
-        ],
-
-        createdAt: "2026-11-05",
-
-        resolvedAt: "2026-11-07"
-    },
-
-    {
-        id: 102,
-
-        title: "Understanding Cache Memory",
-
-        question: "What is the difference between direct mapping and associative mapping in cache memory?",
-
-        subject: "COA",
-
-        teacherName: "Prof. Kamran",
-
-        status: "resolved",
-
-        publishedToLibrary: true,
-
-        isDemo: true,
-
-        tags: ["Cache Memory", "Mapping"],
-
-        teacherResources: [],
-
-        createdAt: "2026-11-04",
-
-        resolvedAt: "2026-11-06"
-    },
-
-    {
-        id: 103,
-
-        title: "First Order Differential Equations",
-
-        question: "How do we identify whether a differential equation is exact or linear, and which method should we apply?",
-
-        subject: "DSTL",
-
-        teacherName: "Prof. Kamlendra",
-
-        status: "resolved",
-
-        publishedToLibrary: true,
-
-        isDemo: true,
-
-        tags: ["Differential Equations", "Mathematics"],
-
-        teacherResources: [
-            {
-                name: "Differential Equations Notes.pdf",
-                size: "850 KB",
-                url: "#"
-            }
-        ],
-
-        createdAt: "2026-11-03",
-
-        resolvedAt: "2026-11-05"
-    },
-
-    {
-        id: 104,
-
-        title: "Python Decorators Explained",
-
-        question: "What exactly happens when a decorator is applied to a function, and how does the wrapper function work?",
-
-        subject: "Python",
-
-        teacherName: "Prof. Vivek Shukla",
-
-        status: "resolved",
-
-        publishedToLibrary: true,
-
-        isDemo: true,
-
-        tags: ["Decorators", "Functions", "Python"],
-
-        teacherResources: [
-            {
-                name: "Python Decorators Guide.pdf",
-                size: "1.5 MB",
-                url: "#"
-            },
-            {
-                name: "Official Python Documentation",
-                url: "https://docs.python.org/3/"
-            }
-        ],
-
-        createdAt: "2026-11-02",
-
-        resolvedAt: "2026-11-04"
-    },
-
-    {
-        id: 105,
-
-        title: "Introduction to Database Normalization",
-
-        question: "Why do we use normalization in relational databases, and how do 1NF, 2NF and 3NF differ?",
-
-        subject: "DE",
-
-        teacherName: "Prof. Nipun Pande",
-
-        status: "resolved",
-
-        publishedToLibrary: true,
-
-        isDemo: true,
-
-        tags: ["Normalization", "DBMS", "SQL"],
-
-        teacherResources: [],
-
-        createdAt: "2026-11-01",
-
-        resolvedAt: "2026-11-03"
-    },
-
-    {
-        id: 106,
-
-        title: "Understanding Context-Free Grammars",
-
-        question: "How can we determine whether a grammar is ambiguous, and what role do parse trees play in this?",
-
-        subject: "TC",
-
-        teacherName: "Dr. Ruchi Shah",
-
-        status: "resolved",
-
-        publishedToLibrary: true,
-
-        isDemo: true,
-
-        tags: ["CFG", "Grammars", "Parse Trees"],
-
-        teacherResources: [
-            {
-                name: "CFG Reference Notes.pdf",
-                size: "920 KB",
-                url: "#"
-            }
-        ],
-
-        createdAt: "2026-10-30",
-
-        resolvedAt: "2026-11-02"
-    }
-
-];
-
-
-// ==========================================
-// 2. INITIALIZE SAMPLE LIBRARY
-// ==========================================
-
-function initializeSampleLibrary() {
-
-    const existingLibrary =
-        localStorage.getItem("clariqLibrary");
-
-    if (existingLibrary === null) {
-
-        localStorage.setItem(
-            "clariqLibrary",
-            JSON.stringify(sampleLibraryDoubts)
-        );
-
-    }
-
+/* ==============================================================================
+   CLARIQ — STUDENT ACADEMIC LIBRARY SCRIPT
+   Integrates directly with FastAPI /api/library/student endpoints
+   ============================================================================== */
+
+const API_BASE_URL = window.location.hostname === "localhost" ? "http://localhost:8000" : "http://127.0.0.1:8000";
+
+let studentSubjects = [];
+let selectedSubjectId = null;
+let currentResources = [];
+let isImportantOnly = false;
+
+function getAuthToken() {
+    return sessionStorage.getItem("clariqToken") || localStorage.getItem("clariqToken");
 }
 
-
-// ==========================================
-// 3. LOAD LIBRARY DATA
-// ==========================================
-
-function loadLibraryData() {
-
-    let library = JSON.parse(
-        localStorage.getItem("clariqLibrary") || "[]"
-    );
-
-    if (!Array.isArray(library)) {
-        library = [];
-    }
-
-    return library.filter(doubt => {
-
-        return (
-
-            doubt.status === "resolved" &&
-
-            (
-                doubt.publishedToLibrary === true ||
-                doubt.isPublished === true ||
-                doubt.libraryPublished === true ||
-                doubt.published === true ||
-                doubt.visibility === "published"
-            )
-
-        );
-
-    });
-
+function authHeaders() {
+    return {
+        "Authorization": `Bearer ${getAuthToken()}`
+    };
 }
 
-
-// ==========================================
-// 4. GET HTML ELEMENTS
-// ==========================================
-
-const searchInput =
-    document.getElementById("searchInput");
-
-const subjectFilter =
-    document.getElementById("subjectSelect");
-
-const libraryList =
-    document.getElementById("libraryList");
-
-const noResults =
-    document.getElementById("noResults");
-
-
-// ==========================================
-// 5. INITIALIZE
-// ==========================================
-
-initializeSampleLibrary();
-
-let allLibraryDoubts = loadLibraryData();
-
-
-// ==========================================
-// 6. FORMAT RELATIVE DATE
-// ==========================================
-
-function formatRelativeDate(dateString) {
-
-    if (!dateString) return "";
-
-    const doubtDate = new Date(dateString);
-
-    if (isNaN(doubtDate.getTime())) return "";
-
-    doubtDate.setHours(0, 0, 0, 0);
-
-    const today = new Date();
-
-    today.setHours(0, 0, 0, 0);
-
-    const difference = Math.floor(
-        (today - doubtDate) / (1000 * 60 * 60 * 24)
-    );
-
-    if (difference === 0) return "Today";
-
-    if (difference === 1) return "Yesterday";
-
-    if (difference < 7) {
-        return `${difference} days ago`;
+function checkAuth() {
+    const token = getAuthToken();
+    if (!token) {
+        window.location.href = "login.html";
+        return false;
     }
-
-    if (difference < 30) {
-
-        const weeks = Math.floor(difference / 7);
-
-        return `${weeks} ${weeks === 1 ? "week" : "weeks"} ago`;
-
-    }
-
-    const months = Math.floor(difference / 30);
-
-    if (months < 12) {
-
-        return `${months} ${months === 1 ? "month" : "months"} ago`;
-
-    }
-
-    const years = Math.floor(months / 12);
-
-    return `${years} ${years === 1 ? "year" : "years"} ago`;
-
+    return true;
 }
 
-
 // ==========================================
-// 7. ESCAPE HTML
+// INITIAL LOAD
 // ==========================================
-
-function escapeHTML(value) {
-
-    return String(value ?? "").replace(/[&<>"']/g, character => {
-
-        const entities = {
-
-            "&": "&amp;",
-            "<": "&lt;",
-            ">": "&gt;",
-            '"': "&quot;",
-            "'": "&#39;"
-
-        };
-
-        return entities[character];
-
-    });
-
-}
-
-
-// ==========================================
-// 8. GET RESOURCE COUNT
-// ==========================================
-
-function getResourceCount(doubt) {
-
-    const resources = [
-
-        ...(Array.isArray(doubt.teacherResources)
-            ? doubt.teacherResources : []),
-
-        ...(Array.isArray(doubt.teacherAttachments)
-            ? doubt.teacherAttachments : []),
-
-        ...(Array.isArray(doubt.answerAttachments)
-            ? doubt.answerAttachments : []),
-
-        ...(Array.isArray(doubt.resources)
-            ? doubt.resources : [])
-
-    ];
-
-    const uniqueResources = new Map();
-
-    resources.forEach(resource => {
-
-        const identifier =
-            resource.fileId ||
-            resource.url ||
-            resource.name;
-
-        if (identifier) {
-
-            uniqueResources.set(identifier, resource);
-
-        }
-
-    });
-
-    return uniqueResources.size;
-
-}
-
-
-// ==========================================
-// 9. CREATE LIBRARY CARD
-// ==========================================
-
-function createLibraryCard(doubt) {
-
-    const card = document.createElement("article");
-
-    card.className = "library-card";
-
-    card.tabIndex = 0;
-
-    card.setAttribute("role", "button");
-
-
-    // SUBJECT
-
-    const subject = escapeHTML(
-        doubt.subject || "General"
-    );
-
-
-    // QUESTION
-
-    const question = escapeHTML(
-        doubt.question ||
-        doubt.description ||
-        doubt.title ||
-        "No question provided."
-    );
-
-
-    // TAGS
-
-    const tags = Array.isArray(doubt.tags)
-        ? doubt.tags
-        : [];
-
-
-    const tagsHTML = tags.length
-
-        ? `
-
-            <div class="library-tags">
-
-                ${tags.map(tag => `
-
-                    <span class="library-tag">
-
-                        ${escapeHTML(tag)}
-
-                    </span>
-
-                `).join("")}
-
-            </div>
-
-        `
-
-        : "";
-
-
-    // TEACHER INFORMATION
-
-    const teacherHTML = `
-
-        <div class="teacher-meta">
-
-            <i data-lucide="user-round"></i>
-
-            <span class="teacher-name">
-
-                ${escapeHTML(
-                    doubt.answeredBy ||
-                    doubt.teacherName ||
-                    "Teacher"
-                )}
-
-            </span>
-
-            <span class="doubt-date">
-
-                ${escapeHTML(
-                    formatRelativeDate(
-                        doubt.resolvedAt ||
-                        doubt.createdAt
-                    )
-                )}
-
-            </span>
-
-        </div>
-
-    `;
-
-
-    // RESOURCE INDICATOR
-
-    const resourceCount = getResourceCount(doubt);
-
-    const resourceHTML = resourceCount > 0
-
-        ? `
-
-            <div class="resource-indicator">
-
-                <i data-lucide="link"></i>
-
-                <span>${resourceCount}</span>
-
-            </div>
-
-        `
-
-        : "";
-
-
-    // CARD HTML
-
-    card.innerHTML = `
-
-        <!-- TOP ROW -->
-
-        <div class="library-card-top">
-
-            <span class="subject-badge">
-
-                ${subject}
-
-            </span>
-
-        </div>
-
-
-        <!-- QUESTION -->
-
-        <p class="library-question">
-
-            ${question}
-
-        </p>
-
-
-        <!-- TAGS -->
-
-        ${tagsHTML}
-
-
-        <!-- BOTTOM ROW -->
-
-        <div class="library-card-bottom">
-
-            ${teacherHTML}
-
-            ${resourceHTML}
-
-        </div>
-
-    `;
-
-
-    // OPEN DOUBT DETAILS
-
-    function openDoubt() {
-
-        window.location.href =
-
-            `doubt-details.html?source=library&id=${encodeURIComponent(doubt.id)}`;
-
-    }
-
-
-    card.addEventListener("click", openDoubt);
-
-
-    card.addEventListener("keydown", event => {
-
-        if (
-            event.key === "Enter" ||
-            event.key === " "
-        ) {
-
-            event.preventDefault();
-
-            openDoubt();
-
-        }
-
-    });
-
-
-    return card;
-
-}
-
-
-// ==========================================
-// 10. DISPLAY LIBRARY CARDS
-// ==========================================
-
-function displayLibrary(doubtsToDisplay) {
-
-    libraryList.innerHTML = "";
-
-    if (doubtsToDisplay.length === 0) {
-
-        noResults.hidden = false;
-
-        return;
-
-    }
-
-    noResults.hidden = true;
-
-
-    doubtsToDisplay.forEach(doubt => {
-
-        libraryList.appendChild(
-            createLibraryCard(doubt)
-        );
-
-    });
-
-
-    // RENDER LUCIDE ICONS
-
-    if (window.lucide) {
-
-        lucide.createIcons();
-
-    }
-
-}
-
-
-// ==========================================
-// 11. SEARCH + SUBJECT FILTER
-// ==========================================
-
-function filterLibrary() {
-
-    const searchText =
-        searchInput.value.toLowerCase().trim();
-
-    const selectedSubject =
-        subjectFilter.value;
-
-
-    const filteredDoubts = allLibraryDoubts.filter(doubt => {
-
-        const tags = Array.isArray(doubt.tags)
-            ? doubt.tags
-            : [];
-
-
-        const searchableContent = [
-
-            doubt.title,
-            doubt.question,
-            doubt.topic,
-            doubt.subject,
-            doubt.teacherName,
-            doubt.answeredBy,
-
-            ...tags
-
-        ].join(" ").toLowerCase();
-
-
-        const matchesSearch =
-            searchableContent.includes(searchText);
-
-
-        const matchesSubject =
-            selectedSubject === "all" ||
-            doubt.subject === selectedSubject;
-
-
-        return matchesSearch && matchesSubject;
-
-    });
-
-
-    displayLibrary(filteredDoubts);
-
-}
-
-
-// ==========================================
-// 12. SEARCH EVENT
-// ==========================================
-
-searchInput.addEventListener(
-    "input",
-    filterLibrary
-);
-
-
-// ==========================================
-// 13. SUBJECT FILTER EVENT
-// ==========================================
-
-subjectFilter.addEventListener(
-    "change",
-    filterLibrary
-);
-
-
-// ==========================================
-// 14. INITIAL DISPLAY
-// ==========================================
-
-displayLibrary(allLibraryDoubts);
-
-
-// ==========================================
-// 15. REFRESH WHEN RETURNING TO LIBRARY
-// ==========================================
-
-window.addEventListener("pageshow", function() {
-
-    allLibraryDoubts = loadLibraryData();
-
-    filterLibrary();
-
+document.addEventListener("DOMContentLoaded", async () => {
+    if (!checkAuth()) return;
+    initUserProfile();
+    setupEventListeners();
+    await loadSubjects();
 });
+
+async function initUserProfile() {
+    try {
+        const rawUser = localStorage.getItem("clariqUser") || sessionStorage.getItem("clariqUser");
+        if (rawUser) {
+            const user = JSON.parse(rawUser);
+            // login.js stores name as 'name', fallback to full_name for compatibility
+            const displayName = user.name || user.full_name || "Student";
+            const nameEl = document.getElementById("studentName");
+            const avatarEl = document.getElementById("studentAvatar");
+            if (nameEl) nameEl.textContent = displayName;
+            if (avatarEl) avatarEl.textContent = displayName.charAt(0).toUpperCase();
+        }
+    } catch (e) {
+        console.error("Error reading user profile", e);
+    }
+
+    // Refresh dynamically from student dashboard profile
+    const token = getAuthToken();
+    if (!token) return;
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/student/dashboard`, {
+            headers: authHeaders()
+        });
+        if (res.ok) {
+            const data = await res.json();
+            const profile = data.profile || (data.data && data.data.profile);
+            if (profile && profile.full_name) {
+                const nameEl = document.getElementById("studentName");
+                const avatarEl = document.getElementById("studentAvatar");
+                if (nameEl) nameEl.textContent = profile.full_name;
+                if (avatarEl) avatarEl.textContent = profile.full_name.charAt(0).toUpperCase();
+            }
+        }
+    } catch (e) {
+        // Ignore transient network errors
+    }
+}
+
+function setupEventListeners() {
+    const subjectSelect = document.getElementById("subjectSelect");
+    if (subjectSelect) {
+        subjectSelect.addEventListener("change", (e) => {
+            selectedSubjectId = parseInt(e.target.value) || null;
+            updateSubjectBanner();
+            loadResources();
+        });
+    }
+
+    const searchInput = document.getElementById("libSearchInput");
+    if (searchInput) {
+        let debounceTimer;
+        searchInput.addEventListener("input", () => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                loadResources();
+            }, 300);
+        });
+    }
+
+    const typeFilter = document.getElementById("typeFilter");
+    if (typeFilter) {
+        typeFilter.addEventListener("change", () => loadResources());
+    }
+
+    const facultyFilter = document.getElementById("facultyFilter");
+    if (facultyFilter) {
+        facultyFilter.addEventListener("change", () => loadResources());
+    }
+
+    const sortSelect = document.getElementById("sortSelect");
+    if (sortSelect) {
+        sortSelect.addEventListener("change", () => loadResources());
+    }
+
+    const btnToggleImportant = document.getElementById("btnToggleImportant");
+    if (btnToggleImportant) {
+        btnToggleImportant.addEventListener("click", () => {
+            isImportantOnly = !isImportantOnly;
+            btnToggleImportant.classList.toggle("active", isImportantOnly);
+            loadResources();
+        });
+    }
+}
+
+// ==========================================
+// LOAD SUBJECTS
+// ==========================================
+async function loadSubjects() {
+    const subjectSelect = document.getElementById("subjectSelect");
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/library/student/subjects`, {
+            headers: authHeaders()
+        });
+
+        if (!response.ok) throw new Error("Failed to load subjects.");
+        const data = await response.json();
+        studentSubjects = data.data || [];
+
+        if (studentSubjects.length === 0) {
+            subjectSelect.innerHTML = `<option value="">No subjects assigned</option>`;
+            return;
+        }
+
+        // Check if query param specifies subject_id
+        const urlParams = new URLSearchParams(window.location.search);
+        const querySubjectId = parseInt(urlParams.get("subject_id"));
+
+        let optionsHtml = "";
+        let matched = false;
+
+        studentSubjects.forEach(s => {
+            const isSelected = querySubjectId && querySubjectId === s.id;
+            if (isSelected) matched = true;
+            optionsHtml += `<option value="${s.id}" ${isSelected ? "selected" : ""}>${escapeHTML(s.code || "")} — ${escapeHTML(s.name)}</option>`;
+        });
+
+        subjectSelect.innerHTML = optionsHtml;
+        selectedSubjectId = matched ? querySubjectId : studentSubjects[0].id;
+        subjectSelect.value = selectedSubjectId;
+
+        updateSubjectBanner();
+        await loadResources();
+
+    } catch (err) {
+        console.error("Error loading subjects:", err);
+        subjectSelect.innerHTML = `<option value="">Error loading subjects</option>`;
+    }
+}
+
+function updateSubjectBanner() {
+    const banner = document.getElementById("subjectBanner");
+    const subjName = document.getElementById("bannerSubjectName");
+    const subjCode = document.getElementById("bannerSubjectCode");
+
+    const found = studentSubjects.find(s => s.id === selectedSubjectId);
+    if (found && banner) {
+        banner.style.display = "flex";
+        subjName.textContent = found.name;
+        subjCode.textContent = found.code ? `Course Code: ${found.code}` : "Course Materials & References";
+    }
+}
+
+// ==========================================
+// LOAD RESOURCES
+// ==========================================
+async function loadResources() {
+    if (!selectedSubjectId) return;
+
+    const loading = document.getElementById("loadingIndicator");
+    const primaryGrid = document.getElementById("primaryGrid");
+    const additionalGrid = document.getElementById("additionalGrid");
+    const primaryEmpty = document.getElementById("primaryEmpty");
+    const additionalEmpty = document.getElementById("additionalEmpty");
+    const primaryCount = document.getElementById("primaryCountBadge");
+    const additionalCount = document.getElementById("additionalCountBadge");
+    const totalCount = document.getElementById("totalResourcesCount");
+
+    if (loading) loading.style.display = "block";
+    if (primaryEmpty) primaryEmpty.style.display = "none";
+    if (additionalEmpty) additionalEmpty.style.display = "none";
+
+    try {
+        const search = document.getElementById("libSearchInput")?.value.trim() || "";
+        const rType = document.getElementById("typeFilter")?.value || "";
+        const fCategory = document.getElementById("facultyFilter")?.value || "";
+        const sort = document.getElementById("sortSelect")?.value || "newest";
+
+        const params = new URLSearchParams({
+            subject_id: selectedSubjectId,
+            sort: sort
+        });
+        if (search) params.append("search", search);
+        if (rType) params.append("resource_type", rType);
+        if (fCategory) params.append("faculty_category", fCategory);
+        if (isImportantOnly) params.append("important_only", "true");
+
+        const response = await fetch(`${API_BASE_URL}/api/library/student/resources?${params.toString()}`, {
+            headers: authHeaders()
+        });
+
+        if (!response.ok) throw new Error("Failed to load resources.");
+        const data = await response.json();
+        currentResources = data.data || [];
+
+        // Split into Primary vs Additional
+        const primaryList = currentResources.filter(r => (r.faculty_category || "PRIMARY").toUpperCase() === "PRIMARY");
+        const additionalList = currentResources.filter(r => (r.faculty_category || "").toUpperCase() === "ADDITIONAL");
+
+        if (totalCount) totalCount.textContent = currentResources.length;
+        if (primaryCount) primaryCount.textContent = `${primaryList.length} resource${primaryList.length === 1 ? "" : "s"}`;
+        if (additionalCount) additionalCount.textContent = `${additionalList.length} resource${additionalList.length === 1 ? "" : "s"}`;
+
+        // Render Primary Section
+        if (primaryList.length > 0) {
+            primaryGrid.innerHTML = primaryList.map(r => renderResourceCard(r)).join("");
+            primaryEmpty.style.display = "none";
+        } else {
+            primaryGrid.innerHTML = "";
+            primaryEmpty.style.display = "block";
+        }
+
+        // Render Additional Section
+        if (additionalList.length > 0) {
+            additionalGrid.innerHTML = additionalList.map(r => renderResourceCard(r)).join("");
+            additionalEmpty.style.display = "none";
+        } else {
+            additionalGrid.innerHTML = "";
+            additionalEmpty.style.display = "block";
+        }
+
+        if (window.lucide) lucide.createIcons();
+
+    } catch (err) {
+        console.error("Error loading resources:", err);
+    } finally {
+        if (loading) loading.style.display = "none";
+    }
+}
+
+// ==========================================
+// RENDER RESOURCE CARD
+// ==========================================
+function renderResourceCard(r) {
+    const isYt = r.resource_type === "youtube";
+    const typeLabel = r.resource_type.toUpperCase();
+    const tagClass = isYt ? "tag-youtube" : (r.resource_type === "pdf" ? "tag-pdf" : "tag-doc");
+    const uploadDate = r.created_at ? new Date(r.created_at).toLocaleDateString(undefined, {
+        year: 'numeric', month: 'short', day: 'numeric'
+    }) : "";
+
+    const isAdditional = (r.faculty_category || "").toUpperCase() === "ADDITIONAL";
+
+    let ytPreviewHtml = "";
+    if (isYt && r.youtube_thumbnail) {
+        ytPreviewHtml = `
+            <div class="yt-thumb-wrapper" onclick="openYtModal('${escapeHTML(r.youtube_video_id)}', '${escapeHTML(r.title)}')">
+                <img src="${escapeHTML(r.youtube_thumbnail)}" alt="Thumbnail" class="yt-thumb">
+                <div class="yt-play-overlay">
+                    <div class="yt-play-btn">
+                        <i data-lucide="play" style="fill: white; width: 22px; height: 22px;"></i>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    return `
+        <div class="resource-card" id="resource-${r.id}">
+            <div>
+                <div class="card-top">
+                    <span class="card-type-tag ${tagClass}">
+                        <i data-lucide="${isYt ? 'video' : (r.resource_type === 'pdf' ? 'file-text' : 'file')}"></i>
+                        ${typeLabel}
+                    </span>
+                    <div style="display: flex; gap: 6px; align-items: center;">
+                        ${isAdditional ? '<span style="font-size: 11px; background: #F1F5F9; color: #475569; padding: 2px 7px; border-radius: 6px; font-weight: 600;">Additional</span>' : ''}
+                        ${r.is_important ? '<span class="important-badge"><i data-lucide="star" style="fill: white; width: 12px; height: 12px;"></i> IMPORTANT</span>' : ''}
+                    </div>
+                </div>
+
+                ${ytPreviewHtml}
+
+                <h4 class="resource-title">${escapeHTML(r.title)}</h4>
+                ${r.description ? `<p class="resource-desc">${escapeHTML(r.description)}</p>` : ''}
+
+                <div class="resource-meta">
+                    <span>
+                        <i data-lucide="user" style="width: 14px; height: 14px;"></i>
+                        <strong>${escapeHTML(r.teacher_name || "Faculty")}</strong>
+                    </span>
+                    <span>
+                        <i data-lucide="calendar" style="width: 14px; height: 14px;"></i>
+                        Uploaded on ${uploadDate}
+                    </span>
+                    ${r.file_size ? `
+                        <span>
+                            <i data-lucide="hard-drive" style="width: 14px; height: 14px;"></i>
+                            ${formatBytes(r.file_size)}
+                        </span>
+                    ` : ''}
+                </div>
+            </div>
+
+            <div class="card-actions">
+                ${isYt ? `
+                    <button class="btn-watch" onclick="openYtModal('${escapeHTML(r.youtube_video_id)}', '${escapeHTML(r.title)}')">
+                        <i data-lucide="play" style="width: 16px; height: 16px;"></i>
+                        Watch Video
+                    </button>
+                ` : `
+                    ${r.resource_type === 'pdf' ? `
+                        <button class="btn-preview" onclick="openPdfPreview(${r.id}, '${escapeHTML(r.title)}')">
+                            <i data-lucide="eye" style="width: 16px; height: 16px;"></i>
+                            Preview
+                        </button>
+                    ` : ''}
+                    <button class="btn-download" onclick="downloadResourceFile(${r.id}, '${escapeHTML(r.original_filename || r.title)}')">
+                        <i data-lucide="download" style="width: 16px; height: 16px;"></i>
+                        Download
+                    </button>
+                `}
+            </div>
+        </div>
+    `;
+}
+
+// ==========================================
+// PREVIEW & DOWNLOAD HANDLERS
+// ==========================================
+async function openPdfPreview(resourceId, title) {
+    const modal = document.getElementById("pdfModal");
+    const modalTitle = document.getElementById("pdfModalTitle");
+    const iframe = document.getElementById("pdfIframe");
+    const downloadBtn = document.getElementById("pdfModalDownloadBtn");
+
+    if (modalTitle) modalTitle.textContent = title;
+    if (downloadBtn) {
+        downloadBtn.onclick = () => downloadResourceFile(resourceId, title + ".pdf");
+    }
+
+    try {
+        // Fetch raw PDF bytes with Authorization header
+        const res = await fetch(`${API_BASE_URL}/api/library/student/resources/${resourceId}/download`, {
+            headers: authHeaders()
+        });
+
+        if (!res.ok) throw new Error("Could not load document preview.");
+        const blob = await res.blob();
+        const objUrl = URL.createObjectURL(blob);
+
+        if (iframe) iframe.src = objUrl;
+        if (modal) modal.classList.add("active");
+
+    } catch (err) {
+        alert("Failed to preview document: " + err.message);
+    }
+}
+
+function closePdfModal() {
+    const modal = document.getElementById("pdfModal");
+    const iframe = document.getElementById("pdfIframe");
+    if (iframe) iframe.src = "";
+    if (modal) modal.classList.remove("active");
+}
+
+async function downloadResourceFile(resourceId, filename) {
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/library/student/resources/${resourceId}/download`, {
+            headers: authHeaders()
+        });
+
+        if (!res.ok) throw new Error("Download failed.");
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename || "resource";
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        a.remove();
+    } catch (err) {
+        alert("Error downloading file: " + err.message);
+    }
+}
+
+// ==========================================
+// YOUTUBE MODAL
+// ==========================================
+function openYtModal(videoId, title) {
+    const modal = document.getElementById("ytModal");
+    const modalTitle = document.getElementById("ytModalTitle");
+    const iframe = document.getElementById("ytIframe");
+
+    if (modalTitle) modalTitle.textContent = title;
+    if (iframe) {
+        iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+    }
+    if (modal) modal.classList.add("active");
+}
+
+function closeYtModal() {
+    const modal = document.getElementById("ytModal");
+    const iframe = document.getElementById("ytIframe");
+    if (iframe) iframe.src = "";
+    if (modal) modal.classList.remove("active");
+}
+
+// ==========================================
+// UTILITIES
+// ==========================================
+function formatBytes(bytes, decimals = 1) {
+    if (!bytes) return "0 Bytes";
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+}
+
+function escapeHTML(str) {
+    return String(str ?? "").replace(/[&<>"']/g, c => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
+    })[c]);
+}

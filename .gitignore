@@ -1,6 +1,8 @@
 # Python virtual environments
 backend-python/venv/
+backend-python/.venv/
 venv/
+.venv/
 
 # Environment variables
 backend-python/.env
@@ -9,6 +11,11 @@ backend-python/.env
 # Python generated files
 __pycache__/
 *.pyc
+.pytest_cache/
+*.db
+
+# Uploads
+backend-python/uploads/
 
 # Editor files
 .vscode/

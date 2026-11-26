@@ -138,18 +138,23 @@ loginForm.addEventListener("submit", async function (event) {
             throw new Error(data.detail || "Login failed.");
         }
 
-        // Store the token for the current browser tab.
+        // Store the token for both sessionStorage and localStorage
         sessionStorage.setItem("clariqToken", data.access_token);
+        localStorage.setItem("clariqToken", data.access_token);
 
-        sessionStorage.setItem(
-            "clariqUser",
-            JSON.stringify({
-                id: data.user_id,
-                collegeId: data.college_id,
-                name: data.name,
-                role: data.role
-            })
-        );
+        const userData = {
+            id: data.user_id,
+            collegeId: data.college_id,
+            name: data.name,
+            role: data.role,
+            department: data.department || "",
+            email: data.email || ""
+        };
+
+        sessionStorage.setItem("clariqUser", JSON.stringify(userData));
+        localStorage.setItem("clariqUser", JSON.stringify(userData));
+        localStorage.setItem("clariqStudentId", data.college_id);
+        localStorage.setItem("clariqTeacherId", data.college_id);
 
         // Redirect according to the role returned by the backend.
         if (data.role === "STUDENT") {

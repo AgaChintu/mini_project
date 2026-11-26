@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chatbot | ClariQ Student</title>
+
+    <link rel="stylesheet" href="../student-css/common.css">
+    <link rel="stylesheet" href="../student-css/ai-chatbot.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+    <!-- SIDEBAR -->
+    <nav class="sidebar">
+        <img src="../assets/images/clariq-logo.svg" alt="ClariQ Logo" class="logo">
+        <ul>
+            <li>
+                <a href="dashboard.html">
+                    <i data-lucide="house"></i>
+                    <span>Home</span>
+                </a>
+            </li>
+            <li>
+                <a href="ask-doubt.html">
+                    <i data-lucide="circle-help"></i>
+                    <span>Ask Doubt</span>
+                </a>
+            </li>
+            <li>
+                <a href="my-doubts.html">
+                    <i data-lucide="message-circle"></i>
+                    <span>My Doubts</span>
+                </a>
+            </li>
+            <li>
+                <a href="library.html">
+                    <i data-lucide="book-open"></i>
+                    <span>Library</span>
+                </a>
+            </li>
+            <li>
+                <a href="ai-chatbot.html" class="nav-item-active">
+                    <i data-lucide="bot"></i>
+                    <span>AI Chatbot</span>
+                </a>
+            </li>
+            <li>
+                <a href="saves.html">
+                    <i data-lucide="bookmark"></i>
+                    <span>Saves</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="anonymous-box">
+            <img src="../assets/icons/anonymous-icon.svg" alt="Anonymous Icon" class="anonymous-icon">
+            <div class="anonymous-text">
+                <h3>Ask Freely, Stay Anonymous</h3>
+                <p>Your identity stays protected when you ask a doubt.</p>
+            </div>
+        </div>
+    </nav>
+
+    <!-- TOPBAR -->
+    <div class="top-right">
+        <button class="profile-btn" type="button">
+            <span class="avatar" id="studentAvatar">S</span>
+            <span id="studentName">Student</span>
+            <i data-lucide="chevron-down"></i>
+        </button>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        <div class="chatbot-wrapper">
+            <!-- HEADER -->
+            <div class="chatbot-header">
+                <div class="chatbot-title-area">
+                    <h1>
+                        <i data-lucide="bot" style="color: #4965E8; width: 30px; height: 30px;"></i>
+                        AI Chatbot
+                    </h1>
+                    <p>Your AI-powered academic assistant.</p>
+                </div>
+                <div class="chatbot-header-actions">
+                    <button type="button" class="btn-chat-action" id="btnClearChat" title="Clear current messages">
+                        <i data-lucide="trash-2" style="width: 15px; height: 15px;"></i>
+                        Clear Chat
+                    </button>
+                    <button type="button" class="btn-chat-action btn-chat-primary" id="btnNewChat" title="Start a fresh conversation">
+                        <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
+                        New Chat
+                    </button>
+                </div>
+            </div>
+
+            <!-- CHAT CARD -->
+            <div class="chat-card">
+                <!-- MESSAGES CONTAINER -->
+                <div class="chat-messages-container" id="chatMessagesContainer">
+                    <!-- Initial Welcome Message (Prompt Section 2.2) -->
+                    <div class="chat-welcome-banner" id="chatWelcomeBanner">
+                        <div class="welcome-icon-box">
+                            <i data-lucide="sparkles" style="width: 22px; height: 22px;"></i>
+                        </div>
+                        <div class="welcome-text">
+                            <h3>Hello! I'm your ClariQ AI Assistant.</h3>
+                            <p>
+                                I'm here to help you understand academic concepts, solve programming questions, explain difficult topics and assist with your studies.<br>
+                                <strong>What would you like to learn today?</strong>
+                            </p>
+                            <div class="welcome-capabilities">
+                                <span class="capability-pill" onclick="sendQuickPrompt('What is a neural network and how does it work?')">
+                                    💡 What is a neural network?
+                                </span>
+                                <span class="capability-pill" onclick="sendQuickPrompt('Explain Binary Search Tree with time complexity')">
+                                    🌲 Explain Binary Search Tree
+                                </span>
+                                <span class="capability-pill" onclick="sendQuickPrompt('Give me a Python example of recursion vs iteration')">
+                                    🐍 Python recursion example
+                                </span>
+                                <span class="capability-pill" onclick="sendQuickPrompt('Explain normalization forms 1NF, 2NF, 3NF in DBMS')">
+                                    📊 DBMS Normalization
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- INPUT AREA -->
+                <div class="chat-input-area">
+                    <form class="chat-input-form" id="chatForm">
+                        <textarea
+                            id="chatInput"
+                            class="chat-textarea"
+                            rows="1"
+                            placeholder="Ask any academic or programming question... (Shift + Enter for new line)"
+                            autocomplete="off"
+                        ></textarea>
+                        <button type="submit" class="btn-send-message" id="btnSend" disabled title="Send Message">
+                            <i data-lucide="send" style="width: 18px; height: 18px;"></i>
+                        </button>
+                    </form>
+                    <div class="chat-footer-disclaimer">
+                        AI-generated responses may need verification. Powered by Groq API.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../student-js/ai-chatbot.js"></script>
+</body>
+</html>

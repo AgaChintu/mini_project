@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academic Library Management | ClariQ Faculty</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="../teacher-css/common.css">
+    <link rel="stylesheet" href="../teacher-css/dashboard.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="../teacher-js/components.js" defer></script>
+
+    <style>
+        .lib-container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 24px 36px 60px;
+        }
+        .page-head {
+            margin-bottom: 28px;
+        }
+        .page-head h1 {
+            font-size: 26px;
+            font-weight: 700;
+            color: #0F2658;
+            margin: 0 0 6px;
+        }
+        .page-head p {
+            font-size: 14px;
+            color: #64748B;
+            margin: 0;
+        }
+
+        /* Two columns layout */
+        .lib-grid-layout {
+            display: grid;
+            grid-template-columns: 460px 1fr;
+            gap: 28px;
+            align-items: start;
+        }
+        @media (max-width: 1024px) {
+            .lib-grid-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel-card {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #E2E8F0;
+            padding: 24px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+        }
+        .panel-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1E293B;
+            margin: 0 0 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Form elements */
+        .form-group {
+            margin-bottom: 18px;
+        }
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 6px;
+        }
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1px solid #CBD5E1;
+            font-size: 14px;
+            font-family: inherit;
+            color: #1E293B;
+            outline: none;
+            transition: border 0.2s;
+            box-sizing: border-box;
+        }
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            border-color: #4965E8;
+        }
+        .form-textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        /* Faculty hierarchy notice */
+        .faculty-role-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+            margin-top: 6px;
+        }
+        .pill-primary {
+            background: #EFF6FF;
+            color: #2563EB;
+            border: 1px solid #BFDBFE;
+        }
+        .pill-additional {
+            background: #FEF3C7;
+            color: #D97706;
+            border: 1px solid #FDE68A;
+        }
+
+        /* Resource Type selector */
+        .type-selector-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+        .type-tab {
+            flex: 1;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid #CBD5E1;
+            background: #F8FAFC;
+            color: #475569;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s;
+        }
+        .type-tab.active {
+            border-color: #4965E8;
+            background: #EFF6FF;
+            color: #2563EB;
+        }
+
+        /* Drag drop area */
+        .drag-drop-zone {
+            border: 2px dashed #CBD5E1;
+            border-radius: 12px;
+            padding: 24px 16px;
+            text-align: center;
+            background: #F8FAFC;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .drag-drop-zone:hover, .drag-drop-zone.dragover {
+            border-color: #4965E8;
+            background: #F0F4FF;
+        }
+        .file-selected-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #EFF6FF;
+            border: 1px solid #BFDBFE;
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin-top: 10px;
+            font-size: 13px;
+            color: #1E3A8A;
+        }
+
+        /* Important Toggle Box */
+        .important-toggle-card {
+            background: #FFFBEB;
+            border: 1px solid #FDE68A;
+            border-radius: 12px;
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background-color: #CBD5E1;
+            transition: .3s;
+            border-radius: 24px;
+        }
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+        input:checked + .toggle-slider {
+            background-color: #F59E0B;
+        }
+        input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
+
+        .btn-submit-resource {
+            width: 100%;
+            padding: 12px;
+            background: #4965E8;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background 0.2s;
+            margin-top: 10px;
+        }
+        .btn-submit-resource:hover {
+            background: #3751D0;
+        }
+        .btn-submit-resource:disabled {
+            background: #94A3B8;
+            cursor: not-allowed;
+        }
+
+        /* Resource Management Table */
+        .table-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .manage-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .manage-table th {
+            text-align: left;
+            font-size: 12px;
+            font-weight: 700;
+            color: #64748B;
+            text-transform: uppercase;
+            padding: 10px 12px;
+            border-bottom: 2px solid #E2E8F0;
+        }
+        .manage-table td {
+            padding: 14px 12px;
+            border-bottom: 1px solid #F1F5F9;
+            font-size: 13px;
+            color: #334155;
+            vertical-align: middle;
+        }
+        .manage-table tr:hover td {
+            background: #F8FAFC;
+        }
+        .res-type-badge {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 6px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+        .idx-badge {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 12px;
+        }
+        .idx-completed { background: #ECFDF5; color: #059669; }
+        .idx-processing { background: #FEF3C7; color: #D97706; }
+        .idx-failed { background: #FEE2E2; color: #DC2626; }
+        .idx-na { background: #F1F5F9; color: #64748B; }
+
+        .btn-icon-action {
+            background: transparent;
+            border: none;
+            color: #64748B;
+            padding: 6px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-icon-action:hover {
+            background: #E2E8F0;
+            color: #1E293B;
+        }
+        .btn-icon-delete:hover {
+            background: #FEE2E2;
+            color: #DC2626;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- SIDEBAR -->
+    <div id="sidebar-container"></div>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <!-- TOPBAR -->
+        <div id="topbar-container"></div>
+
+        <div class="lib-container">
+            <!-- PAGE HEAD -->
+            <div class="page-head">
+                <h1>Academic Library Management</h1>
+                <p>Upload textbooks, study notes, question banks, and instructional videos. Distinguishes automatically between Primary and Additional Faculty.</p>
+            </div>
+
+            <div class="lib-grid-layout">
+                <!-- LEFT COLUMN: UPLOAD RESOURCE FORM -->
+                <div class="panel-card">
+                    <h3 class="panel-title">
+                        <i data-lucide="cloud-upload" style="color: #4965E8;"></i>
+                        Upload New Resource
+                    </h3>
+
+                    <form id="uploadResourceForm">
+                        <!-- SUBJECT SELECT -->
+                        <div class="form-group">
+                            <label class="form-label" for="resourceSubjectSelect">Subject</label>
+                            <select id="resourceSubjectSelect" class="form-select" required>
+                                <option value="">Loading your assigned subjects...</option>
+                            </select>
+                            <div id="facultyRoleNotice"></div>
+                        </div>
+
+                        <!-- TITLE -->
+                        <div class="form-group">
+                            <label class="form-label" for="resourceTitle">Resource Title</label>
+                            <input type="text" id="resourceTitle" class="form-input" placeholder="e.g. Unit 3 — Tree Data Structures Notes" required maxlength="300">
+                        </div>
+
+                        <!-- DESCRIPTION -->
+                        <div class="form-group">
+                            <label class="form-label" for="resourceDesc">Description (optional)</label>
+                            <textarea id="resourceDesc" class="form-textarea" placeholder="Key topics covered, syllabus unit, examination relevance..."></textarea>
+                        </div>
+
+                        <!-- RESOURCE TYPE SELECTOR -->
+                        <div class="form-group">
+                            <label class="form-label">Resource Format</label>
+                            <div class="type-selector-tabs">
+                                <button type="button" class="type-tab active" data-type="pdf">
+                                    <i data-lucide="file-text"></i>
+                                    <span>PDF Document</span>
+                                </button>
+                                <button type="button" class="type-tab" data-type="doc">
+                                    <i data-lucide="file"></i>
+                                    <span>DOC / DOCX</span>
+                                </button>
+                                <button type="button" class="type-tab" data-type="youtube">
+                                    <i data-lucide="video"></i>
+                                    <span>YouTube Video</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- DOCUMENT UPLOAD ZONE (for PDF, DOC, DOCX) -->
+                        <div id="docUploadSection">
+                            <div class="form-group">
+                                <label class="form-label">Upload File</label>
+                                <div class="drag-drop-zone" id="dropZone">
+                                    <i data-lucide="upload" style="width: 32px; height: 32px; color: #94A3B8; margin-bottom: 8px;"></i>
+                                    <p style="font-size: 13px; color: #475569; margin: 0 0 4px;">Drag & drop your document here, or <strong style="color: #4965E8;">Browse</strong></p>
+                                    <p style="font-size: 11px; color: #94A3B8; margin: 0;">PDF, DOC, DOCX up to 50 MB</p>
+                                    <input type="file" id="docFileInput" style="display: none;" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+                                </div>
+                                <div id="selectedFileInfo" style="display: none;" class="file-selected-box">
+                                    <div style="display: flex; align-items: center; gap: 8px; overflow: hidden;">
+                                        <i data-lucide="file-check" style="flex-shrink: 0; width: 16px; height: 16px;"></i>
+                                        <span id="selectedFileName" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600;"></span>
+                                        <span id="selectedFileSize" style="color: #64748B; font-size: 12px;"></span>
+                                    </div>
+                                    <button type="button" id="btnRemoveFile" style="background: none; border: none; color: #DC2626; cursor: pointer; padding: 2px;">
+                                        <i data-lucide="x" style="width: 16px; height: 16px;"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- YOUTUBE URL ZONE -->
+                        <div id="youtubeUploadSection" style="display: none;">
+                            <div class="form-group">
+                                <label class="form-label" for="ytUrlInput">YouTube Video URL</label>
+                                <input type="url" id="ytUrlInput" class="form-input" placeholder="https://www.youtube.com/watch?v=... or https://youtu.be/...">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="ytCustomTitle">Video Title (optional)</label>
+                                <input type="text" id="ytCustomTitle" class="form-input" placeholder="Defaults to resource title if empty">
+                            </div>
+                            <div id="ytLivePreview" style="display: none; margin-bottom: 16px; border-radius: 10px; overflow: hidden; border: 1px solid #CBD5E1;">
+                                <img id="ytPreviewImg" src="" alt="Video Preview" style="width: 100%; height: 160px; object-fit: cover;">
+                            </div>
+                        </div>
+
+                        <!-- IMPORTANT TOGGLE (Only enabled for Additional Faculty) -->
+                        <div id="importantToggleWrapper" class="form-group" style="display: none;">
+                            <div class="important-toggle-card">
+                                <div>
+                                    <div style="font-size: 13px; font-weight: 700; color: #92400E; display: flex; align-items: center; gap: 6px;">
+                                        <i data-lucide="star" style="width: 14px; height: 14px; fill: #F59E0B;"></i>
+                                        Mark as Important Resource
+                                    </div>
+                                    <p style="font-size: 11px; color: #B45309; margin: 2px 0 0;">
+                                        Highlights this resource with an IMPORTANT badge on student dashboards.
+                                    </p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="importantCheckbox">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- UPLOAD PROGRESS & STATUS -->
+                        <div id="uploadProgressWrapper" style="display: none; margin-bottom: 14px;">
+                            <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; color: #334155; margin-bottom: 6px;">
+                                <span id="uploadProgressLabel">Uploading...</span>
+                                <span id="uploadProgressPercent">0%</span>
+                            </div>
+                            <div style="width: 100%; height: 8px; background: #E2E8F0; border-radius: 999px; overflow: hidden;">
+                                <div id="uploadProgressBar" style="width: 0%; height: 100%; background: #4965E8; transition: width 0.15s ease;"></div>
+                            </div>
+                        </div>
+                        <div id="uploadStatusBanner" style="display: none; margin-bottom: 14px; padding: 10px 12px; border-radius: 10px; font-size: 13px; font-weight: 500;"></div>
+
+                        <!-- SUBMIT BUTTON -->
+                        <button type="submit" id="btnSubmitResource" class="btn-submit-resource">
+                            <i data-lucide="upload"></i>
+                            Publish to Academic Library
+                        </button>
+                    </form>
+                </div>
+
+                <!-- RIGHT COLUMN: MANAGE UPLOADED RESOURCES -->
+                <div class="panel-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <h3 class="panel-title" style="margin: 0;">
+                            <i data-lucide="folder" style="color: #4965E8;"></i>
+                            Your Published Resources
+                        </h3>
+                        <span id="resourceCountPill" style="font-size: 12px; font-weight: 700; background: #F1F5F9; color: #475569; padding: 4px 10px; border-radius: 20px;">
+                            0 items
+                        </span>
+                    </div>
+
+                    <!-- TABLE FILTERS -->
+                    <div class="table-controls">
+                        <input type="text" id="manageSearchInput" class="form-input" style="flex: 1; min-width: 180px; padding: 8px 12px;" placeholder="Search title...">
+                        <select id="manageSubjectFilter" class="form-select" style="width: auto; padding: 8px 12px;">
+                            <option value="">All Subjects</option>
+                        </select>
+                        <select id="manageTypeFilter" class="form-select" style="width: auto; padding: 8px 12px;">
+                            <option value="">All Types</option>
+                            <option value="pdf">PDF</option>
+                            <option value="doc">DOC/DOCX</option>
+                            <option value="youtube">YouTube</option>
+                        </select>
+                    </div>
+
+                    <!-- TABLE -->
+                    <div style="overflow-x: auto;">
+                        <table class="manage-table">
+                            <thead>
+                                <tr>
+                                    <th>Title & Subject</th>
+                                    <th>Type</th>
+                                    <th>Category</th>
+                                    <th>Uploaded</th>
+                                    <th style="text-align: right;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="manageResourcesBody">
+                                <tr>
+                                    <td colspan="5" style="text-align: center; color: #94A3B8; padding: 30px;">Loading resources...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- EDIT RESOURCE MODAL -->
+    <div id="editResourceModal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.65); z-index: 1000; align-items: center; justify-content: center; padding: 20px;">
+        <div style="background: white; border-radius: 16px; max-width: 500px; width: 100%; padding: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.2);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: #0F172A;">Edit Resource</h3>
+                <button type="button" onclick="closeEditModal()" style="background: none; border: none; cursor: pointer; color: #64748B;">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <form id="editResourceForm">
+                <input type="hidden" id="editResourceId">
+                <div class="form-group">
+                    <label class="form-label" for="editTitle">Title</label>
+                    <input type="text" id="editTitle" class="form-input" required maxlength="300">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="editDesc">Description</label>
+                    <textarea id="editDesc" class="form-textarea"></textarea>
+                </div>
+                <div id="editImportantWrapper" class="form-group" style="display: none;">
+                    <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: #92400E; cursor: pointer;">
+                        <input type="checkbox" id="editImportantCheckbox" style="width: 16px; height: 16px;">
+                        <span>⭐ Important Resource Badge</span>
+                    </label>
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px;">
+                    <button type="button" onclick="closeEditModal()" style="padding: 8px 16px; border: 1px solid #CBD5E1; background: white; border-radius: 8px; cursor: pointer; font-weight: 600;">Cancel</button>
+                    <button type="submit" style="padding: 8px 18px; background: #4965E8; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 700;">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../teacher-js/library.js"></script>
+</body>
+</html>
